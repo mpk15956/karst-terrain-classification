@@ -1,0 +1,100 @@
+\documentclass{article}
+\usepackage{amsmath, graphicx, amssymb, amsfonts}
+
+% --- User-defined command for the topology ---
+%\newcommand{\tau}{\mathbb{T}}
+
+\title{Computational Topology - Problem Set 1}
+\author{Michael Kerr}
+\date{September 25, 2025}
+
+\begin{document}
+\maketitle
+
+\section*{1. Determine which of the following is a proper topology for the integers $\mathbb{Z}$.}
+
+\subsection*{(a) Let $\mathbb{Z}_{O}$ denote the odd integers and $\mathbb{Z}_{E}$ denote the even integers. $\tau=\{\emptyset,\mathbb{Z}_{O},\mathbb{Z}_{E},\mathbb{Z}\}$}
+
+This set is a proper topology on $\mathbb{Z}$ because it satisfies the three axioms:
+
+\begin{enumerate}
+    \item The empty set and the whole space are in $\tau$: Both $\emptyset$ and $\mathbb{Z}$ are included in the set.
+
+    \item Closed under arbitrary unions: The union of any combination of the sets results in a set that is already in $\tau$. For instance, $\mathbb{Z}_{O} \cup \mathbb{Z}_{E} = \mathbb{Z}$, which is in $\tau$. All other unions are trivial (e.g., $\emptyset \cup \mathbb{Z}_O = \mathbb{Z}_O$).
+
+    \item Closed under finite intersections: The intersection of any finite number of sets is also in $\tau$. The only non-trivial intersection is $\mathbb{Z}_{O} \cap \mathbb{Z}_{E} = \emptyset$, which is in $\tau$.
+\end{enumerate}
+
+\hrulefill
+
+\subsection*{(b) Let $k\in\mathbb{N}$ and $\mathbb{Z}_{k}$ denote the integers that whose absolute value is less than k (i.e. $|x|<k$). $\tau=\{\mathbb{Z}_{k}|k\in\mathbb{Z}\}$}
+
+This set is not a proper topology.
+It fails the first axiom because $\mathbb{Z}$ is not an element of $\tau$ 
+(there is no integer $k$ for which the set $\{x \in \mathbb{Z} : |x| < k\}$ is equal to the infinite set $\mathbb{Z}$).
+To make this a proper topology, we must add $\mathbb{Z}$ to the set:
+$$ \tau' = \tau \cup \{\mathbb{Z}\} $$
+This corrected set is now a proper topology:
+\begin{enumerate}
+    \item $\emptyset$ is in the set (since there is no x that satisfies $|x| < k$ for $k \leq 0$), and we have added $\mathbb{Z}$.
+    \item The union of any collection of sets $\mathbb{Z}_{k_i}$ is $\mathbb{Z}_{\sup(k_i)}$, which is in $\tau$. If the set of indices is unbounded, the union is $\mathbb{Z}$, which is in $\tau'$.
+    \item The intersection of any two sets $\mathbb{Z}_{k_1} \cap \mathbb{Z}_{k_2}$ is $\mathbb{Z}_{\min(k_1, k_2)}$, which is in $\tau$.
+\end{enumerate}
+
+\hrulefill
+
+\section*{2. Let $(\mathbb{Z}, \tau)$ be a topological space. Suppose that $\{\{n,n+1\}|n\in\mathbb{Z}\}\subset\tau$. Prove that $\tau$ is the discrete topology.}
+
+To prove that $\tau$ is the discrete topology, we must show that any subset of $\mathbb{Z}$ is an open set. We will show that every singleton set $\{m\}$ for any $m \in \mathbb{Z}$ is in $\tau$.
+
+\begin{enumerate}
+    \item We are given that for any integer $n$, the set $\{n, n+1\}$ is in $\tau$.
+    \item This implies that the set $\{n-1, n\}$ is also in $\tau$ (by simply choosing $n-1$ as our integer).
+    \item The axioms of a topology state that it must be closed under finite intersections. Let's take the intersection of two adjacent open sets:
+    $$ \{n-1, n\} \cap \{n, n+1\} = \{n\} $$
+    \item Since both $\{n-1, n\}$ and $\{n, n+1\}$ are in $\tau$, their intersection, the singleton set $\{n\}$, must also be in $\tau$. This is true for any integer $n$.
+    \item Now, let $A$ be any arbitrary subset of $\mathbb{Z}$. We can express $A$ as the union of all its singleton elements:
+    $$ A = \bigcup_{a \in A} \{a\} $$
+    \item Since every singleton set $\{a\}$ is in $\tau$, and a topology is closed under arbitrary unions, the set $A$ must be in $\tau$.
+\end{enumerate}
+Because any subset $A \subseteq \mathbb{Z}$ is in $\tau$, $\tau$ is the power set of $\mathbb{Z}$, which is the definition of the discrete topology.
+
+\hrulefill
+
+\section*{3. Let $X=\{1,2,3,4\}$. Show that $(X, \tau)$ and $(X,\Upsilon)$ are homeomorphic.}
+
+Given the topologies:
+$$ \tau=\{\emptyset,\{2\},\{1,2\},\{3,4\},X\} $$
+$$ \Upsilon=\{\emptyset,\{1\},\{2,3\},\{1,4\}, X\} $$
+To show that $(X, \tau)$ and $(X, \Upsilon)$ are homeomorphic, we need to find a function $f: X \to X$ that is a bijection, continuous, and has a continuous inverse.
+Consider the function $f: (X, \tau) \to (X, \Upsilon)$ such that:
+\begin{itemize}
+    \item $f(1) = 4$
+    \item $f(2) = 1$
+    \item $f(3) = 2$
+    \item $f(4) = 3$
+\end{itemize}
+This function is a bijection as it is a permutation of the elements of $X$.
+
+\paragraph{1. Continuity of $f$:} We must show that for every open set $U \in \Upsilon$, its preimage $f^{-1}(U)$ is open in $\tau$.
+\begin{itemize}
+    \item $f^{-1}(\emptyset) = \emptyset \in \tau$
+    \item $f^{-1}(\{1\}) = \{2\} \in \tau$
+    \item $f^{-1}(\{2,3\}) = \{3,4\} \in \tau$
+    \item $f^{-1}(\{1,4\}) = \{1,2\} \in \tau$
+    \item $f^{-1}(X) = X \in \tau$
+\end{itemize}
+Since the preimage of every open set in $\Upsilon$ is open in $\tau$, $f$ is continuous.
+
+\paragraph{2. Continuity of $f^{-1}$ (Open Map property):} We must show that for every open set $V \in \tau$, its image $f(V)$ is open in $\Upsilon$.
+\begin{itemize}
+    \item $f(\emptyset) = \emptyset \in \Upsilon$
+    \item $f(\{2\}) = \{1\} \in \Upsilon$
+    \item $f(\{1,2\}) = \{4,1\} = \{1,4\} \in \Upsilon$
+    \item $f(\{3,4\}) = \{2,3\} \in \Upsilon$
+    \item $f(X) = X \in \Upsilon$
+\end{itemize}
+Since the image of every open set in $\tau$ is open in $\Upsilon$, $f^{-1}$ is continuous.
+Because $f$ is a continuous bijection with a continuous inverse, it is a homeomorphism, and the spaces $(X, \tau)$ and $(X, \Upsilon)$ are homeomorphic.
+
+\end{document}
