@@ -1,0 +1,765 @@
+---
+title: "When TDA Works: Combining Topological and Traditional Features for Karst Classification"
+subtitle: "GEOG 6591: Introduction to Geospatial Artificial Intelligence"
+author: "Michael Kerr"
+institute: "Course Instructor: Dr. Weiming Hu | Math DRP Advisor: Cameron Thomas, PhD Candidate"
+date: "December 4, 2025"
+bibliography: references.bib
+csl: chicago-author-date.csl
+format: clean-revealjs
+jupyter: false
+resources:
+  - ../../../outputs/presentation_visuals
+filters:
+  - tikz
+tikz:
+  cache: true  # Enable caching for faster re-renders
+---
+
+<style>
+/* Right-align tikz figures in revealjs */
+.reveal .slides section .quarto-figure-right,
+.reveal .slides section figure.quarto-figure-right,
+.reveal .slides section img.quarto-figure-right,
+.reveal .slides section svg.quarto-figure-right,
+.reveal .slides section .tikz-right,
+.reveal .slides section figure.tikz-right,
+.reveal .slides section img.tikz-right,
+.reveal .slides section svg.tikz-right {
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  display: block;
+  width: auto;
+}
+
+/* Target tikz figures in list items (more specific) */
+.reveal .slides section ul li figure.tikz-right,
+.reveal .slides section ul li img.tikz-right,
+.reveal .slides section ul li svg.tikz-right,
+.reveal .slides section ul li .tikz-right {
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  display: block;
+  width: auto;
+}
+</style>
+
+## Outline
+
+- **The Problem**: Automated terrain classification challenge
+- **Study Area & Data**: Warren/Hardin Counties, Kentucky (Mammoth Cave region)
+- **Four Competing Approaches**: Traditional, TDA, Deep Learning, Hybrid
+- **Topology Overview**: TDA in simple terms
+- **Experimental Design**: Random vs Spatial cross-validation
+- **Results**: Performance, efficiency, and practical impact
+- **Interpretation**: What worked and practical recommendations
+
+# The Problem
+
+## Research Question
+
+:::{.callout-important}
+## Research Question
+
+Can Topological Data Analysis (TDA) enhance traditional geomorphology metrics for classifying surficial geology from Digital Elevation Models (DEMs) while improving computational efficiency?
+:::
+
+:::{.notes}
+Traditional geomorphometry requires expert interpretation of slope, curvature, and drainage patterns. TDA offers coordinate-free shape descriptors. Do they capture karst morphology effectively?
+:::
+
+## The Challenge & Why Karst Matters
+
+**Challenge:**
+
+- Expensive field surveys
+- Time-consuming manual interpretation
+- Expert knowledge and resources
+
+**Why karst matters:**
+
+- Karst aquifers provide 25% of global drinking water
+- Sinkholes cause $300M+ annual infrastructure damage in US
+- Climate change accelerates karst evolution
+
+:::{.notes}
+Traditional surficial geology mapping requires expensive field surveys, time-consuming manual interpretation, and expert knowledge. Climate change accelerates karst evolution, making automated monitoring increasingly necessary.
+:::
+
+## Opportunity & Hypothesis
+
+- Groundwater management and aquifer protection
+- Hazard assessment (sinkhole risk mapping)
+- Land use planning and infrastructure development
+- Large-scale automated monitoring
+
+:::{.callout-note}
+## Hypothesis vs. Finding
+
+**Hypothesis:** TDA can replace expensive multi-scale geomorphometry.
+
+**Finding:** It cannot replace expensive multi-scale geomorphometry, but combining them gives best results.
+:::
+
+:::{.notes}
+Automated classification from DEMs could enable groundwater management, support hazard assessment, inform land use planning, and enable large-scale automated monitoring. This study compares four computational approaches to find the best method. We'll explore why combining TDA with traditional methods works best.
+:::
+
+# Study Area & Dataset
+
+## Study Area: Warren & Hardin Counties, Kentucky
+
+<div style="text-align: center;">
+
+![Study Area Map](../../../outputs/presentation_visuals/study_area_map.png){width=80%}
+
+**Mammoth Cave National Park Region**
+
+</div>
+
+:::{.notes}
+This region is ideal for karst terrain classification. The Kentucky sinkhole plain is a type locality for covered karst, with 1000+ sinkholes per km² in some areas and complex interaction of surface/subsurface drainage. High-quality 1m LiDAR DEMs capture micro-topography, and surficial geology is well-documented by USGS and state geological survey. The topologically complex terrain is ideal for testing TDA's shape-capture ability.
+:::
+
+## Dataset: EarthScape Multi-label Classification
+
+- **30,643 DEM tiles** (256×256 pixels each)
+- **7 surficial geology classes:**
+  - af1: Artificial Fill
+  - Qal: Alluvium
+  - Qaf: Alluvial Fans
+  - Qat: Alluvial Terraces
+  - Qc: Colluvium
+  - Qca: Colluvial Accumulations
+  - Qr: Residuum
+
+![Class Distribution](../../../outputs/presentation_visuals/class_distribution.png){width=80%}
+
+:::{.notes}
+This is a multi-label classification problem. Tiles can have multiple classes simultaneously, for example Qal (Alluvium) combined with Qc (Colluvium).
+:::
+
+# Four Competing Approaches
+
+## Four Computational Approaches
+
+![Four Approaches Overview](../../../outputs/presentation_visuals/four_approaches.png){width=90%}
+
+**Goal:**
+
+- Predictive accuracy (F1-macro score)
+- Computational efficiency (time per tile)
+- Interpretability
+
+:::{.notes}
+We aim to determine which approach provides the best balance of predictive accuracy, computational efficiency, and interpretability. Understanding what features matter is crucial for practical applications.
+:::
+
+## Deep Learning Inputs: What the Models See
+
+**Arena 1 (Geometry):** 3-channel input from DEM derivatives
+
+![Geometry Inputs](../../../outputs/presentation_visuals/vision_inputs_geometry.png){width=90%}
+
+**Arena 2 (RGB):** Aerial imagery from EarthScape dataset
+
+![RGB Inputs](../../../outputs/presentation_visuals/vision_inputs_rgb.png){width=90%}
+
+# Topology Overview
+
+## Topological Data Analysis (TDA)
+
+**TDA tracks how topological features like sinkholes and ridges appear and disappear as we filter terrain by elevation threshold.**
+
+<div class="fragment" data-fragment-index="0">
+
+<div style="position: relative; width: 100%; height: 600px; margin: 20px 0;">
+
+<iframe 
+  id="tdaviz-iframe"
+  src="viz/index.html" 
+  width="100%" 
+  height="100%" 
+  frameborder="0"
+  style="border: 2px solid #2E7D32; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+</iframe>
+
+</div>
+
+**Instructions:** Drag the slider to raise/lower the "water level" and watch topological features appear and disappear. The barcode diagram (right) shows persistence intervals.
+
+</div>
+
+<div id="fallback-viz" class="fragment" data-fragment-index="1" style="display: none;">
+
+<div style="text-align: center;">
+
+![](../../../outputs/presentation_visuals/filtration_frames/filtration_frame_01.png){width=80%}
+
+*Interactive visualization unavailable. Showing static filtration frames.*
+
+</div>
+
+</div>
+
+<script>
+// Fallback handler: if iframe fails to load, show static images
+// More robust approach for Reveal.js context
+document.addEventListener('DOMContentLoaded', function() {
+    const iframe = document.getElementById('tdaviz-iframe');
+    const fallback = document.getElementById('fallback-viz');
+    
+    if (iframe && fallback) {
+        let loaded = false;
+        
+        // Mark as loaded when iframe loads successfully
+        iframe.addEventListener('load', function() {
+            loaded = true;
+            // Optional: try to verify iframe actually has content (may fail due to CORS)
+            try {
+                // This will fail if iframe is empty or cross-origin, but that's OK
+                iframe.contentWindow?.document; // Just check, don't reassign
+            } catch (e) {
+                // Cross-origin or other access issue - that's OK, load event fired means iframe loaded
+            }
+        });
+        
+        // Check after delay if iframe didn't load
+        setTimeout(function() {
+            if (!loaded) {
+                // Iframe didn't load within timeout, show fallback
+                iframe.style.display = 'none';
+                fallback.style.display = 'block';
+                console.warn('[TDA_VIZ]: Iframe failed to load, showing fallback');
+            }
+        }, 5000); // 5 second timeout
+    }
+});
+</script>
+
+<div style="text-align: center;">
+
+![](../../../outputs/presentation_visuals/filtration_frames/filtration_frame_01.png){.fragment data-fragment-index="2" width=80%}
+
+![](../../../outputs/presentation_visuals/filtration_frames/filtration_frame_03.png){.fragment data-fragment-index="3" width=80%}
+
+![](../../../outputs/presentation_visuals/filtration_frames/filtration_frame_05.png){.fragment data-fragment-index="4" width=80%}
+
+![](../../../outputs/presentation_visuals/filtration_frames/filtration_frame_07.png){.fragment data-fragment-index="5" width=80%}
+
+</div>
+
+:::{.notes}
+Interactive visualization demonstrates the core concept of persistent homology: as we filter terrain by elevation threshold, topological features (sinkholes, peaks) are born and die. Long-lasting features are geologically significant. Sinkholes are topological holes, and ridges are peaks. Long-lasting features are geologically significant, while transient features are noise.
+:::
+
+## Why Three Filtrations?
+
+- **Elevation:** valleys and depressions
+- **Slope:** steep areas and terrain steepness patterns  
+- **Superlevel:** peaks and ridges
+
+:::{.notes}
+Different filtrations capture different morphology. Elevation captures valleys and depressions, slope captures steep areas and terrain steepness patterns, and superlevel captures peaks and ridges.
+:::
+
+![Elevation Filtration](../../../outputs/presentation_visuals/filtration_comparison_elevation.png){width=30%}
+![Slope Filtration](../../../outputs/presentation_visuals/filtration_comparison_slope.png){width=30%}
+![Superlevel Filtration](../../../outputs/presentation_visuals/filtration_comparison_superlevel.png){width=30%}
+
+# Detailed TDA Formalism
+
+## Simplicial Complexes: Building Blocks of Topology
+
+**Definition:** An abstract simplicial complex $K$ is a collection of subsets of vertices closed under subsets ($\sigma \in K, \tau \subseteq \sigma \implies \tau \in K$).
+
+**Basis Elements:** A $k$-simplex is a subset with $k+1$ vertices.
+
+- **0-Simplex**: $\{v_0\}$ (Vertex)
+
+  ```{tikz}
+  #| fig-format: svg
+  #| echo: false
+  #| eval: false
+  #| fig-width: 1.5
+  #| fig-height: 1
+  #| fig-align: right
+  #| classes: tikz-right
+  \begin{tikzpicture}[baseline=-0.5ex,scale=0.8]
+      \node[circle, fill=black, inner sep=2pt, label=below:{\small$v_0$}] at (0, 0) {};
+  \end{tikzpicture}
+  ```
+
+- **1-Simplex**: $\{v_0, v_1\}$ (Edge)
+
+  ```{tikz}
+  #| fig-format: svg
+  #| echo: false
+  #| eval: false
+  #| fig-width: 2.5
+  #| fig-height: 1
+  #| fig-align: right
+  #| classes: tikz-right
+  \begin{tikzpicture}[baseline=-0.5ex,scale=0.8]
+      \draw[thick] (0,0) -- (1.5,0);
+      \node[circle, fill=black, inner sep=1.5pt, label=below:{\small$v_0$}] at (0,0) {};
+      \node[circle, fill=black, inner sep=1.5pt, label=below:{\small$v_1$}] at (1.5,0) {};
+  \end{tikzpicture}
+  ```
+
+- **2-Simplex**: $\{v_0, v_1, v_2\}$ (Face)
+
+  ```{tikz}
+  #| fig-format: svg
+  #| echo: false
+  #| eval: false
+  #| fig-width: 3
+  #| fig-height: 2.5
+  #| fig-align: right
+  #| classes: tikz-right
+  \begin{tikzpicture}[baseline=-0.5ex,scale=0.8]
+      \fill[blue!20] (0,0) -- (1.5,0) -- (0.75,1.3) -- cycle;
+      \draw[thick] (0,0) -- (1.5,0) -- (0.75,1.3) -- cycle;
+      \node[circle, fill=black, inner sep=1.5pt, label=below:{\small$v_0$}] at (0,0) {};
+      \node[circle, fill=black, inner sep=1.5pt, label=below:{\small$v_1$}] at (1.5,0) {};
+      \node[circle, fill=black, inner sep=1.5pt, label=above:{\small$v_2$}] at (0.75,1.3) {};
+  \end{tikzpicture}
+  ```
+
+**For terrain:** Simplices represent how elevation points connect to form topological features (sinkholes, peaks, valleys).
+
+## Betti Numbers: Counting Topological Features
+
+**Betti numbers** count $k$-dimensional "holes" in the terrain:
+
+- $\beta_0$: **Connected components** (separate landmasses)
+- $\beta_1$: **1D loops** (sinkholes, closed depressions)
+- $\beta_2$: **2D voids** (cavities, underground features)
+
+**Key property:** Topological invariants are coordinate-free and deformation-invariant. They describe terrain *shape* regardless of how we measure it.
+
+## Persistent Homology: Multi-Scale Topology
+
+**Filtration:** A nested sequence of complexes $\emptyset = K_0 \subseteq K_1 \subseteq \cdots \subseteq K_n$
+
+:::{.callout-note}
+## Sublevel Set Filtration
+
+Given elevation function $f: X \to \mathbb{R}$, the sublevel set filtration is:
+
+$$X_t = \{x \in X \mid f(x) \le t\}$$
+
+As threshold $t$ increases, we track how topological features (sinkholes, peaks) appear and disappear.
+:::
+
+**For terrain:** Persistence measures how "significant" a feature is. Long-lasting features like deep sinkholes are more geologically important than transient ones.
+
+## Geometric Realizations: Cubical vs Simplicial Complexes
+
+::: {.columns}
+::: {.column width="50%"}
+<div style="text-align: center;">
+
+**Simplicial Complex**
+
+```{tikz}
+#| fig-format: svg
+#| echo: false
+#| eval: false
+#| fig-align: center
+#| fig-width: 5
+#| fig-height: 5
+\begin{tikzpicture}[scale=1.2]
+    % Draw a grid with triangulation
+    \fill[red!10] (0,0) rectangle (2,2);
+    \draw[step=1cm, gray, thin] (0,0) grid (2,2);
+    % Add diagonals to make triangles
+    \draw[gray, thin] (0,0) -- (1,1);
+    \draw[gray, thin] (1,0) -- (2,1);
+    \draw[gray, thin] (0,1) -- (1,2);
+    \draw[gray, thin] (1,1) -- (2,2);
+
+    % Highlight one 2-simplex
+    \fill[red!30] (0,0) -- (1,0) -- (1,1) -- cycle;
+    \draw[red, thick] (0,0) -- (1,0) -- (1,1) -- cycle;
+
+    % Vertices
+    \foreach \x in {0,1,2}
+        \foreach \y in {0,1,2}
+            \node[circle, fill=black, inner sep=1pt] at (\x,\y) {};
+\end{tikzpicture}
+```
+
+- Requires triangulation
+- General-purpose
+
+</div>
+:::
+::: {.column width="50%"}
+<div style="text-align: center;">
+
+**Cubical Complex**
+
+```{tikz}
+#| fig-format: svg
+#| echo: false
+#| eval: false
+#| fig-align: center
+#| fig-width: 5
+#| fig-height: 5
+\begin{tikzpicture}[scale=1.2]
+    % Draw a grid of squares
+    \fill[blue!10] (0,0) rectangle (2,2);
+    \draw[step=1cm, black, thick] (0,0) grid (2,2);
+
+    % Highlight one pixel/cube
+    \fill[blue!30] (0,0) rectangle (1,1);
+    \draw[blue, thick] (0,0) rectangle (1,1);
+\end{tikzpicture}
+```
+
+- Native to grid/DEM data
+- No artificial subdivision
+- More efficient for raster data
+
+</div>
+:::
+:::
+
+**For DEMs:** Cubical complexes avoid unnecessary triangulation, making TDA computations faster.
+
+## Vectorization Methods for Machine Learning
+
+<div style="text-align: center;">
+
+![Feature Rosetta Stone](../../../outputs/presentation_visuals/256_50_11_feature_rosetta_stone.png){width=67%}
+
+</div>
+
+:::{.notes}
+This visualization shows how different feature extraction methods represent the same terrain tile. It's a "Rosetta Stone" connecting all feature representations back to a single piece of terrain, demonstrating the tradeoffs between different approaches.
+:::
+
+# Experimental Design
+
+## The Spatial Autocorrelation Problem
+
+![Experimental Design: Random vs Spatial CV](../../../outputs/presentation_visuals/experimental_design.png){width=100%}
+
+**Problem:** Geospatial data has spatial autocorrelation. Nearby tiles are similar.
+
+- **Random CV:** mixes training and test tiles from same region
+- **Spatial CV:** groups tiles by geological region
+
+:::{.notes}
+Random CV mixes training and test tiles from the same region, leading to inflated performance. Spatial CV groups tiles by geological region, providing honest generalization estimates. Random CV inflates performance by approximately 7 F1 points. Spatial CV provides realistic estimates for real-world deployment.
+:::
+
+## Our Experimental Approach
+
+- Leave-One-Region-Out cross-validation (`GroupKFold`, 8 regions)
+- Random Forest (MultiOutputClassifier) with balanced class weights
+- F1-macro metric
+
+:::{.notes}
+We use Leave-One-Region-Out cross-validation with GroupKFold across 8 regions total. The classifier is Random Forest with MultiOutputClassifier wrapper and balanced class weights. F1-macro handles multi-label and imbalanced classification.
+:::
+
+# Results: Random CV Performance
+
+## Random CV: Top Performers
+
+| Rank | Method | Dimensions | F1-macro |
+|------|--------|------------|----------|
+| 1 | Multi-scale + Texture | 84d | **0.731** ± 0.006 |
+| 2 | Multi-scale + Texture + Betti | 184d | **0.728** ± 0.009 |
+| 3 | Multi-scale + Betti | 170d | **0.726** ± 0.012 |
+| 4 | Multi-scale Derivatives | 70d | **0.725** ± 0.008 |
+| 5 | ResNet-50 (Geometry) | 2048d | **0.714** ± 0.011 |
+| 6 | Core Derivatives | 30d | **0.712** ± 0.009 |
+| 7 | ViT-Base (Geometry) | 768d | **0.708** ± 0.010 |
+| 8 | Betti Curves | 100d | **0.606** ± 0.009 |
+
+## Classification Results
+
+::: {.columns}
+::: {.column width="50%"}
+<div style="text-align: center;">
+
+**Computational Efficiency**
+
+![Timing Feasibility](../../../outputs/presentation_visuals/timing_feasibility.png){width=100%}
+
+</div>
+:::
+::: {.column width="50%"}
+<div style="text-align: center;">
+
+**Predictive Power**
+
+![Performance Comparison](../../../outputs/presentation_visuals/performance_comparison.png){width=100%}
+
+</div>
+:::
+:::
+
+:::{.notes}
+Side-by-side comparison of computational efficiency and predictive power. TDA alone underperforms traditional methods, but TDA plus Traditional combinations achieve best performance. The highest F1 score of 0.731 is not the ultra-robust method. The ultra-robust method (Multi-scale + Betti, 0.726) has the strongest statistical evidence of equivalence, though slightly lower F1.
+:::
+
+## Statistical Robustness: Ultra-Robust Methods
+
+![Ultra-Robust Methods](../../../outputs/presentation_visuals/ultra_robust_methods.png){width=90%}
+
+:::{.notes}
+Three methods show near-certainty with Bonferroni-corrected p less than 0.0002 in both CV types. P-values are 200 to 8,000 times below the ultra-conservative threshold. All three combine multiscale Betti curves with multiscale derivatives. This is our strongest scientific finding, demonstrating that topological features are most effective when integrated with traditional features at multiple scales.
+:::
+
+# Results: Spatial CV (Geographic Reality)
+
+## Spatial CV: Performance Drops, Rankings Shift
+
+| Rank | Method | Dimensions | F1-macro |
+|------|--------|------------|----------|
+| 1 | Multi-scale + Betti | 170d | **0.663** ± 0.149 |
+| 2 | Multi-scale + Texture + Betti | 184d | **0.662** ± 0.138 |
+| 3 | Multi-scale Derivatives | 70d | **0.659** ± 0.148 |
+| 4 | Multi-scale + Texture | 84d | **0.658** ± 0.127 |
+| 5 | ResNet-50 (Geometry) | 2048d | **0.647** ± 0.192 |
+| 17 | Betti Curves | 100d | **0.561** ± 0.118 |
+
+![Random vs Spatial Comparison](../../../outputs/presentation_visuals/random_vs_spatial_comparison.png){width=100%}
+
+:::{.notes}
+All methods drop approximately 7 F1 points due to spatial autocorrelation effect. Hybrid approaches combining TDA and Traditional still lead. Deep learning doesn't outperform traditional methods. TDA alone performs worst.
+:::
+
+## What These Numbers Mean
+
+| Metric | Value | Real-World Translation |
+|--------|-------|------------------------|
+| F1 = 0.663 (Hybrid) | Best | **66% of 30k tiles correct**; 10k need review |
+| F1 = 0.561 (TDA alone) | Poor | **56% accuracy**, unacceptable for operations |
+| Δ = 0.10 F1 | Improvement | **~3,000 fewer errors** vs TDA alone |
+| 10× speedup | Efficiency | **100 km² in 2 hrs** vs 20 hrs |
+
+:::{.callout-important}
+## Key Takeaway
+
+Hybrid gives 66% accuracy at 2× speed. Viable for first-pass automated mapping.
+:::
+
+:::{.notes}
+The hybrid approach requires expert review for 34% of ambiguous tiles. This is a practical workflow for large-scale mapping operations.
+:::
+
+## Classification Challenges
+
+**Hardest classes:**
+
+- Rare classes (Qp, Qe)
+- Multi-label tiles (Qal + Qc)
+
+**Where TDA alone fails:**
+
+- Flat valleys (Qal/Alluvium)
+- Low-relief areas (Qr vs Qc)
+
+:::{.notes}
+Rare classes underperform due to limited training data. Multi-label tiles show higher error rates. TDA alone fails in flat valleys with no topological features to capture, and in low-relief areas where TDA cannot distinguish between similar geologies like Qr versus Qc.
+:::
+
+## Geographic Insights
+
+Models struggle most where geology boundaries are ambiguous.
+
+:::{.notes}
+Models struggle most where geology boundaries are ambiguous or where surficial deposits overlap. This is precisely where expert interpretation is most valuable.
+:::
+
+## Evidence Tiers: Statistical Confidence Levels
+
+![Evidence Tiers](../../../outputs/presentation_visuals/evidence_tier_visualization.png){width=90%}
+
+- **Tier 1 (Ultra-robust):** 3 methods
+- **Tier 2 (Robust):** 12 methods
+- **Tier 3 (Standard):** 5 methods
+- **Tier 4 (Exploratory):** 6 methods
+- **Tier 5 (Not equivalent):** 9 methods
+
+:::{.notes}
+Five-tier hierarchy based on TOST equivalence tests and Bonferroni correction. Tier 1 has 3 methods with Bonferroni correction in both CV types (near-certainty). Tier 2 has 12 methods with Bonferroni correction in one CV type. Tier 3 has 5 methods with standard equivalence at alpha equals 0.05 in both CV types. Tier 4 has 6 methods with standard equivalence in one CV type. Tier 5 has 9 methods showing clear differences. This hierarchy accommodates different perspectives on statistical rigor, from ultra-conservative Bonferroni to exploratory single CV type.
+:::
+
+# Computational Efficiency
+
+## Timing Comparison: TDA is 10× Faster
+
+![Computational Cost](../../../outputs/presentation_visuals/timing_comparison_enhanced.png){width=90%}
+
+- TDA: **~0.085 seconds per tile**
+- Traditional: **~0.981 seconds per tile**
+- **10× speedup**
+
+:::{.notes}
+TDA features compute in approximately 0.085 seconds per tile versus traditional methods at 0.981 seconds per tile. TDA is approximately 10 times faster than WhiteboxTools-based traditional features. Deep learning GPU inference is fast at around 0.1 seconds but requires pre-trained models and GPU resources.
+:::
+
+# Dimensionality-Performance Trade-off
+
+## Feature Dimension vs Performance
+
+![Performance vs Dimension](../../../outputs/presentation_visuals/performance_vs_dimension_enhanced.png){width=90%}
+
+- **Best Traditional:** Multi-scale + Texture (84d, F1=0.731)
+- **Best Hybrid:** Multi-scale + Texture + Betti (184d, F1=0.728)
+- **TDA alone:** Betti curves (100d, F1=0.606)
+- **Deep Learning:** ResNet-50 (2048d, F1=0.714)
+- **Persistence Images:** 5000d, F1=0.669
+
+:::{.notes}
+Best Traditional method is Multi-scale plus Texture at 84 dimensions with F1 of 0.731. Best Hybrid is Multi-scale plus Texture plus Betti at 184 dimensions with F1 of 0.728. TDA alone with Betti curves is compact at 100 dimensions but insufficient with F1 of 0.606. Deep Learning ResNet-50 has high dimension at 2048 but doesn't outperform. Persistence Images at 5000 dimensions have too high dimension for marginal gain. TDA adds value with minimal dimensions when combined with traditional features.
+:::
+
+# Interpretation: What Worked and Why
+
+## What Each Approach Captures
+
+**Traditional:**
+
+- Local geometry
+- Multi-scale patterns
+- Texture
+
+**TDA:**
+
+- Global connectivity
+- Multi-scale topology
+- Shape invariance
+
+:::{.notes}
+Traditional features capture local geometry including slope steepness, curvature, and topographic position. They also capture multi-scale patterns like TPI at different radii and roughness at various scales, plus texture including surface roughness and spatial autocorrelation. TDA features capture global connectivity like sinkhole networks and drainage patterns, multi-scale topology with features that persist across elevation thresholds, and shape invariance as a coordinate-free representation of terrain structure.
+:::
+
+## Why Hybrid Works
+
+**Best combination:** Multi-scale derivatives + Betti curves
+
+- Traditional provides local context
+- TDA captures global connectivity
+- Together: comprehensive terrain representation
+
+:::{.notes}
+This confirms that TDA enhances, not replaces, traditional features. The hybrid approach succeeds because TDA and traditional methods capture complementary information: local geometry versus global connectivity. Deep learning learns opaque patterns but doesn't outperform, likely due to limited training data at 30k tiles, pre-trained models not specialized for terrain, and no clear advantage over interpretable features.
+:::
+
+# When to Use What?
+
+## When to Use TDA vs Traditional
+
+**Use TDA when:**
+
+- Terrain connectivity matters
+- Compact, interpretable features needed
+- Computational efficiency important
+- Combining with traditional features feasible
+
+**Use Traditional when:**
+
+- Local geometry most important
+- Established, well-understood metrics needed
+- Interpretability critical
+- WhiteboxTools cost acceptable
+
+:::{.notes}
+Use TDA when terrain connectivity matters, such as in karst, caves, and drainage networks. TDA is approximately 10 times faster than traditional methods. Use traditional methods when local geometry is most important, when you need established well-understood metrics, when interpretability is critical, and when WhiteboxTools computational cost is acceptable.
+:::
+
+## Hybrid Approach & What to Avoid
+
+**Use Hybrid when:**
+
+- Resources allow combining features
+- Best possible performance needed
+- Both local and global patterns matter
+
+**Avoid:**
+
+- Persistence images alone
+- TDA alone for karst classification
+
+:::{.notes}
+Use Hybrid TDA plus Traditional when resources allow combining features, when you want best possible performance, and when both local and global patterns matter. Avoid persistence images alone due to high dimension and low performance. Avoid TDA alone for karst classification as it provides insufficient information. Deep learning is only recommended if you have large labeled datasets and need end-to-end learning.
+:::
+
+# Limitations & Future Directions
+
+## Current Limitations
+
+- Spatial CV reveals lower performance
+- Hyperparameter tuning incomplete
+- Limited to Kentucky karst
+- Single filtration function tested
+
+:::{.notes}
+Spatial CV reveals lower performance. Random CV inflates metrics by approximately 7 F1 points. Hyperparameter tuning for persistence image resolution and Betti curve bins could be optimized. Results are limited to Kentucky karst and may not generalize to other regions. Only elevation and slope filtrations were tested.
+:::
+
+## Future Directions
+
+**Methodological:**
+
+- Multi-feature filtrations
+- Spatial stratification refinement
+- Hyperparameter optimization
+
+**Alternative TDA methods:**
+
+- Mapper algorithm, Reeb graphs, Morse-Smale complexes
+- Extended persistence, zigzag persistence, multiparameter persistence
+- Graph TDA
+
+**Application expansion:**
+
+- Test on other karst regions
+- Apply to non-karst terrain types
+- Integrate with field survey data
+
+:::{.notes}
+Methodological improvements include multi-feature filtrations applying TDA to slope, curvature, and TWI rasters, spatial stratification refinement with better region grouping strategies, and hyperparameter optimization with systematic tuning of TDA parameters. Alternative TDA methods include Mapper algorithm, Reeb graphs, Morse-Smale complexes, extended persistence, zigzag persistence, multiparameter persistence, and Graph TDA using clique complexes on terrain networks. Application expansion includes testing on other karst regions beyond Kentucky, applying to non-karst terrain types, and integrating with field survey data for validation.
+:::
+
+# Conclusions: Practical Takeaways
+
+## Key Findings
+
+1. TDA alone underperforms traditional geomorphometry (F1: 0.606 vs 0.731)
+
+2. TDA + Traditional = Best (F1: 0.726 random, 0.663 spatial)
+
+3. Computational advantage: TDA is **10× faster** (~0.085s vs ~0.981s per tile)
+
+4. Deep learning: expensive, opaque, doesn't outperform (F1: 0.647 spatial vs 0.663 hybrid)
+
+5. Recommendation: Use **hybrid TDA + traditional features**
+
+:::{.notes}
+TDA alone underperforms traditional geomorphometry with F1 of 0.606 versus 0.731. TDA plus Traditional equals Best with F1 of 0.726 in random CV and 0.663 in spatial CV for Multi-scale plus Betti, the ultra-robust method with strongest statistical evidence. TDA is 10 times faster than traditional methods at approximately 0.085 seconds versus 0.981 seconds per tile. Deep learning is expensive, opaque, and doesn't outperform with F1 of 0.647 spatial versus 0.663 hybrid. Recommendation is to use hybrid TDA plus traditional features for karst terrain classification. Hybrid methods provide the best accuracy with computational efficiency. TDA enhances traditional geomorphometry rather than replacing it.
+:::
+
+## Impact
+
+- Proof-of-concept: TDA provides efficient, interpretable features
+- Practical value: Hybrid approach offers best accuracy with reasonable cost
+- Geographic generalization: Spatial CV provides honest performance estimates
+
+:::{.notes}
+This is a proof-of-concept demonstrating that TDA provides efficient, interpretable features for terrain classification. The hybrid approach offers practical value with best accuracy and reasonable computational cost. Spatial CV provides honest performance estimates for real-world deployment and geographic generalization.
+:::
+
+## Questions? {.r-fit-text}
+
+# References
+
+::: {#refs}
+:::

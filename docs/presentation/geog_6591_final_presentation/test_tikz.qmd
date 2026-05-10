@@ -1,0 +1,37 @@
+---
+title: "TikZ Rendering Test"
+format: html
+tikz:
+  cache: true
+---
+
+# TikZ Rendering Test
+
+This is a minimal test to verify TikZ rendering works.
+
+## Simple Test Diagram
+
+```{tikz}
+#| fig-format: svg
+#| echo: false
+\begin{tikzpicture}
+    \node[circle, fill=blue] at (0, 0) {};
+    \node[circle, fill=red] at (2, 0) {};
+    \draw[thick] (0, 0) -- (2, 0);
+\end{tikzpicture}
+```
+
+If you see a blue dot, a red dot, and a line connecting them above, TikZ rendering is working!
+
+## Another Test
+
+```{tikz}
+#| fig-format: svg
+\begin{tikzpicture}
+    \fill[blue!20] (0,0) rectangle (2,1);
+    \draw[thick] (0,0) rectangle (2,1);
+    \node at (1,0.5) {Test};
+\end{tikzpicture}
+```
+
+If you see a blue rectangle with "Test" text, TikZ rendering is working!

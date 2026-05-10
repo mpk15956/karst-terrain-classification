@@ -1,0 +1,20 @@
+/*-- scss:defaults --*/
+
+/* Mimic Beamer Beaver Red Accent Theme */
+
+:root {
+  --r-main-color: #333;
+  --r-heading-color: #cc0000; /* Dark Red Headers */
+  --r-link-color: #cc0000;
+  --r-link-color-hover: #990000;
+}
+
+/*-- scss:rules --*/
+
+/* Style callout-important to match alertblock aesthetic */
+.reveal .callout-important {
+  background-color: #fff0f0;
+  border-left-color: #cc0000;
+  border-left-width: 4px;
+}
+

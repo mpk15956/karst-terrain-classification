@@ -1,0 +1,64 @@
+/*-- scss:rules --*/
+
+// Beamer-Style Callout Blocks
+// This file provides styling that mimics classic Beamer theme blocks
+// (Warsaw/Madrid style) with colored header bars
+
+// Mimic Beamer "Block" (Note) - Blue header style
+.callout-note {
+  border: 1px solid #0d47a1 !important; // Dark Blue Border
+  border-radius: 8px !important;
+  background-color: #e3f2fd !important; // Light Blue Background
+  
+  .callout-header {
+    background-color: #0d47a1 !important; // Dark Blue Header
+    color: white !important;
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+    padding: 0.5em 1em;
+    font-weight: 600;
+  }
+  
+  .callout-body {
+    padding: 1em;
+  }
+}
+
+// Mimic Beamer "Alert Block" (Important/Warning) - Red header style
+.callout-important, 
+.callout-warning {
+  border: 1px solid #b71c1c !important; // Dark Red Border
+  border-radius: 8px !important;
+  background-color: #ffebee !important; // Light Red Background
+  
+  .callout-header {
+    background-color: #b71c1c !important; // Dark Red Header
+    color: white !important;
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+    padding: 0.5em 1em;
+    font-weight: 600;
+  }
+  
+  .callout-body {
+    padding: 1em;
+  }
+}
+
+// Usage Instructions:
+// 
+// To use this Beamer-style blocks theme, update your YAML header:
+//
+// format:
+//   revealjs:
+//     theme: [default, beamer-blocks.scss]
+//
+// Or combine with other themes:
+//     theme: [serif, beamer-blocks.scss, custom.scss]
+//
+// Available theme options:
+// 1. Clean theme: format: clean-revealjs (already installed)
+// 2. Beamer blocks: format: revealjs: theme: [default, beamer-blocks.scss]
+// 3. Metropolis: May need manual installation from GitHub
+//    Check: https://github.com/shafayetShafee/quarto-revealjs-metropolis
+
