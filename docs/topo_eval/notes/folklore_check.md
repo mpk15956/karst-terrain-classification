@@ -116,13 +116,69 @@ order of novelty strength:
 The bijection lemma sits between (2) and (3) as the
 folklore-formalization step that makes the rest interpretable.
 
-## Caveat: one deep read before final submission
+## Caveat resolved 2026-05-29: Cousty-Najman 2019 remains disjoint
 
-The Cousty-Najman hierarchical-watershed line is large. Specifically,
-**"Characterization of Graph-Based Hierarchical Watersheds"**
-(Cousty, Najman, et al., *Journal of Mathematical Imaging and
-Vision* 2019) formalizes hierarchical watersheds in graph-theoretic
-language closest to this paper's claim. A deep read before final
-submission would catch any near-overlap that the agent search did
-not surface from abstracts alone. Add to the Phase A pre-submission
-checklist.
+A targeted second-pass read of Santana Maia, Cousty, Najman, Perret,
+"Characterization of Graph-Based Hierarchical Watersheds," *JMIV*
+2019/2020 (HAL hal-02280023v2; Springer 10.1007/s10851-019-00936-6),
+plus its surrounding line (Cousty-Bertrand 2012 on edge/node-weight
+equivalence, Najman-Cousty-Perret ISMM 2013, Perret-Cousty *TIP*
+2018, and the authors' own Higra reference implementation), confirms
+the framework is structurally disjoint from this paper's lemma.
+
+**Structural distinctions.**
+
+- *Scalar field.* Their framework ranks **edge weights** (or
+  equivalent vertex weights via the Cousty-Bertrand 2012
+  flooding-graph transform). The field is a dissimilarity/contrast,
+  i.e. local. Our scalar is **flow accumulation $A$**, a vertex-valued
+  *global* integral (drainage area). $A$ is neither a dissimilarity
+  nor an edge weight; it does not reduce to either form.
+- *Graph.* Their framework operates on any **undirected
+  edge-weighted graph**; the imaging instances use spatial 4/8-grids
+  with gradient/colour weights. Our graph is the **D8 flow graph**, a
+  *directed* functional graph (each non-pit vertex points to its
+  steepest receiver). The flow graph is the graph of a discrete vector
+  field, not an edge-weighted graph in their sense.
+- *Central construction.* Their key object is the **binary partition
+  hierarchy by altitude ordering** (BPH): a Kruskal-style sequential
+  union of edge endpoints in ascending edge-weight order, equivalent
+  to MST construction; the hierarchical watershed is a pruning of the
+  BPH by an attribute (area, volume, dynamics) of regional minima.
+  Our object is the merge tree of a vertex sublevel filtration of $A$
+  on the donor graph, swept by elder rule. BPH-by-edge-rank and
+  merge-tree-by-vertex-sublevel are different filtrations even if the
+  underlying graph were the same.
+- *Hydrology vocabulary absent.* Their "watershed" is Beucher-Meyer
+  flooding on a dissimilarity surface, used for image segmentation.
+  Flow accumulation, drainage networks, and Horton-Strahler do not
+  appear in the JMIV 2019 paper, its surrounding line, or Higra.
+
+**Why the obvious unification attempt fails.** If one tried to
+recover our lemma by setting their edge weights to $\max(A_u, A_v)$
+on the D8 flow graph, two structural mismatches remain: (i) the
+framework requires an undirected (or flooding-graph-symmetrizable)
+graph and the D8 graph is directed; (ii) their hierarchy is built by
+edge-rank Kruskal merges, so its leaves are individual pixels rather
+than channel heads, and it does not equal the merge tree of $A$.
+
+**Verdict.** Disjoint. The existing positioning in this note ("scalar
+field is elevation or generic image gradient," "spatial adjacency,"
+"Horton-Strahler/channel-network interpretation absent") survives.
+No reframe is needed. The bijection lemma's framing as
+folklore-formalization on a *directed* donor graph with a
+*vertex-valued integral* scalar is the genuinely novel posture
+relative to this body of work, and the donor-graph adjacency choice
+is the sharpest surviving novelty point.
+
+**Access caveat (pre-submission action, not blocking).** The verdict
+above rests on the consistent abstract across multiple aggregators,
+the surrounding-paper definitions (Cousty-Bertrand 2012 arXiv:1204.2837;
+Najman-Cousty-Perret 2013; Perret-Cousty 2018), and the Higra reference
+implementation by the same authors. The full JMIV PDF was 403-gated by
+Anubis access control during the second-pass read. The residual risk
+that the paper buries a directed-graph or vertex-integral
+generalization outside its abstract and framework commitments is low,
+but a 30-minute targeted skim of §§2–3 (definitions) and §6
+(algorithms) on a campus-library copy before manuscript submission
+will close it. Add to the pre-submission checklist.

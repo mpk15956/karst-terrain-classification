@@ -175,16 +175,31 @@ def stats_from_flowlines(
 def stats_from_merge_tree(tree, *, area_km2: float | None = None,
                           channel_cell_count: int | None = None,
                           cell_km: float | None = None) -> BranchingStats:
-    """Branching summary of a PH-derived merge tree (the metric side)."""
-    dist = tree.strahler_distribution()
-    rb = _bifurcation_ratio(dist)
+    """Branching summary of a PH-derived merge tree (the metric side).
+
+    Junctions and Strahler are read off the segment graph (one node per
+    merge-tree confluence; degree-2 runs already collapsed during the
+    donor union-find), so they sit in the same representational units
+    as the NHD-side and whitebox-side flowline-graph stats. Horton R_b
+    is computed on the LARGEST basin only (see
+    segment_graph.bifurcation_ratio_largest_basin for why per-tile
+    forests inflate this on real tiles).
+    """
+    from geo_tda.topo_eval.segment_graph import (
+        bifurcation_ratio_largest_basin,
+        segment_graph_from_merge_tree,
+    )
+
+    sg = segment_graph_from_merge_tree(tree)
+    dist = sg.strahler_distribution()
+    rb = bifurcation_ratio_largest_basin(tree)
     if area_km2 and channel_cell_count and cell_km:
         total_len_km = channel_cell_count * cell_km
         density = total_len_km / area_km2
     else:
         density = float("nan")
     return BranchingStats(
-        junction_count=tree.num_confluences,
+        junction_count=sg.num_junctions,
         strahler_distribution=dist,
         bifurcation_ratio=rb,
         drainage_density=density,
