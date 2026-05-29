@@ -1,0 +1,279 @@
+# Topological Evaluation Metrics for Generative Terrain Models — A Literature Review for Paper Positioning
+
+## TL;DR
+- **No published paper applies persistence-based distributional tests as an evaluation regime for generative DEM/terrain models**; the proposed framing — particularly under a flow-accumulation filtration capturing drainage-network topology — is novel.
+- The closest priors are (i) Khrulkov & Oseledets' Geometry Score (PMLR v80:2621–2629, ICML 2018) and Horak, Yu & Salimi-Khorshidi's Topology Distance (AAAI 2021, DOI 10.1609/aaai.v35i9.16943) for GAN evaluation in generic image domains, (ii) persistent-homology cosmic-web analyses by Sousbie, Pranav, van de Weygaert and Biagetti–Cole–Shiu that already use sublevel-set PH on 2D/3D scalar fields, and (iii) TDA-on-DEMs work (Edelsbrunner–Harer–Zomorodian's hierarchical Morse-Smale complexes, Agarwal–Edelsbrunner–Harer–Wang's "Extreme elevation on a 2-manifold," Kerber's terrain simplification, Syzdykbayev et al. 2020 on landslides) — none of which evaluate generators.
+- Of 16 surveyed generative terrain models, **exactly 7 (≈44%) have confirmed runnable code+weights**: 5 of the 10 diffusion-era models (MESA, TerraFusion, GrounDiff, Goslin's Terrain Diffusion, Diff-DEM) plus the legacy Beckham & Pal 2017 and Guérin et al. 2017 GAN releases; **none** impose hard-constrained architectural priors such as mass conservation, PDE-derived priors, or Helmholtz decomposition, supporting the user's claim that their constrained-diffusion contribution is architecturally distinctive.
+
+## Key Findings
+
+1. **Novelty is real and defensible.** Persistence-based distributional comparison of generated vs. real DEMs — and especially under a flow-accumulation filtration — is not present in any indexed paper. The construct combines two literatures (TDA evaluation of generative models; PH on scalar terrain fields) that have not been bridged.
+
+2. **The generative-terrain landscape is dominated by diffusion/flow models post-2023.** No surveyed model uses physical conservation laws, Helmholtz decompositions, or PDE-constrained architectures as hard priors; conditioning is via sketches, text captions, low-resolution priors, or DEM features.
+
+3. **Evaluation is impoverished.** Current evaluation in terrain generation papers relies almost exclusively on FID, LPIPS, SSIM, MSE/RMSE, slope/elevation histograms, distance correlation, and small user studies. The Galin et al. (2019) review and the recent terrain-diffusion papers tacitly acknowledge this gap. Kim et al. (NeurIPS 2023, TopP&R) put the broader-domain critique plainly: "Existing metrics, such as Inception Score (IS), Fréchet Inception Distance (FID), and various Precision and Recall (P&R) variants, rely heavily on support estimates derived from sample features. However, the reliability of these estimates has been overlooked… current methods not only fail to accurately assess sample quality when support estimation is unreliable, but also yield inconsistent results."
+
+4. **Cosmology is the most transferable analog.** TDA evaluation of cosmological density fields and emulators (Sousbie 2010, Pranav et al. 2021, van de Weygaert et al. 2011, Biagetti–Cole–Shiu 2020, Heydenreich et al. 2021, Yip–Rouhiainen–Shiu 2023) provides a near-template: sublevel-set PH on 2D/3D scalar maps, comparison via persistence diagrams/Betti curves, and emulator validation. Medical-imaging topological-loss work (Hu, Clough, Stucki, Erden) offers the differentiable-PH machinery for a training-time extension.
+
+5. **Methodological backbone exists off-the-shelf.** Sliced-Wasserstein kernels on persistence diagrams (Carrière–Cuturi–Oudot, ICML 2017), persistence images (Adams et al., *JMLR* 2017), MMD two-sample tests (Gretton et al., *JMLR* 2012), permutation tests for PD populations (Robinson & Turner; Chazal et al.; Fasy et al. 2014) — all required statistical machinery is already published.
+
+---
+
+## 1. Generative Terrain Models — Comprehensive Survey
+
+### 1.1 Diffusion / flow-matching models (the 2023–2025 wave)
+
+- **TerraFusion** (Higo, Kanai, Endo, Kanamori; CGI 2025 / *Virtual Reality & Intelligent Hardware* 7(6):560–576, 2025; arXiv:2505.04050). Latent diffusion model that jointly generates heightmap + texture in a fused latent space, with a domain-specific VAE trained on terrain heightmaps and a sketch-conditioning external adapter. No physical priors.
+
+- **MESA: Text-Driven Terrain Generation Using Latent Diffusion and Global Copernicus Data** (Borne-Pons, Czerkawski, Martin, Rouffet; CVPR-W MORSE 2025, DOI 10.1109/CVPRW67362.2025.00289; arXiv:2504.07210). StableDiffusion adapted to 2.5D terrain (DEM + reflectance), trained on a curated Major TOM Core-DEM extension built from Copernicus 30 m DEM tiles. Text conditioning. No physical priors.
+
+- **Terrain Diffusion Network (TDN)** (Hu, Hu, Mo, Pan, Wang; AAAI 2024, DOI 10.1609/aaai.v38i11.29150; arXiv:2308.16725). Multi-level denoising scheme with three terrain synthesisers (structural / intermediate / fine-grained), pretrained terrain autoencoders, and sketch conditioning indicating "rivers, ridges, basins, peaks." Climate-aware in the loss/training narrative but not via PDE constraints.
+
+- **Geodiffussr** (Inui, Matsumura, Simo-Serra; Nov 2025, arXiv:2511.23029). Flow-matching pipeline for **texture** generation conditioned on a supplied DEM via multi-scale content aggregation (MCA); does **not** generate DEMs themselves. Reports FID, LPIPS, ∆dCor as evaluation.
+
+- **InfiniteDiffusion / Terrain Diffusion** (Goslin; Dec 2025, arXiv:2512.08309). DDPM successor to Perlin noise: hierarchical stack of diffusion models providing seed-consistent, constant-time random access generation for unbounded worlds; Laplacian encoding for Earth-scale dynamic range. Marketed as a practical alternative to procedural noise.
+
+- **GrounDiff + PrioStitch** (Dhaouadi, Meier, Cremers + DeepScenario; Nov 2025, arXiv:2511.10391). DSM→DTM translation framed as iterative denoising; PrioStitch is a coarse-to-fine global-prior tiling scheme. Inverse-problem rather than unconditional generation; reports RMSE.
+
+- **Diff-DEM** (Lo & Peters; *IEEE GRSL* 2024, DOI 10.1109/LGRS.2024.3404279). DDPM for DEM void-filling. Self-supervised; inverse problem.
+
+- **TFDM (Terrain Feature-guided Diffusion Model)** (Yu et al., *Remote Sensing of Environment* 2024, DOI 10.1016/j.rse.2024.114386). Diffusion for DEM void-filling guided by ridge/valley feature lines. Inverse problem; soft (not hard) physical guidance.
+
+- **LD-DEM** (MDPI *Aerospace* 12(8):658, 2025). Latent diffusion for planetary DEM generation from RGB satellite images with a conditional decoder.
+
+- **Lochner et al., "Interactive Authoring of Terrain using Diffusion Models"** (*Computer Graphics Forum* 2023, DOI 10.1111/cgf.14941). Diffusion model with gradient-domain (slope) modelling and user authoring.
+
+- **Argudo, Schott, Guérin, Galin, "Gradient Terrain Authoring"** (*CGF* 2022, DOI 10.1111/cgf.14460). Not strictly a generative diffusion model but pioneering gradient-domain authoring.
+
+### 1.2 GAN-based lineage (the foundational era, 2017–2022)
+
+- **Beckham & Pal, "A step towards procedural terrain generation with GANs"** (arXiv:1707.03383, ICML VGML workshop 2017). DCGAN for heightmaps + pix2pix for texture, trained on NASA Visible Earth.
+- **Guérin, Digne, Galin, Peytavie, Wolf, Benes, Martinez, "Interactive Example-Based Terrain Authoring with Conditional Generative Adversarial Networks"** (SIGGRAPH Asia 2017, *ACM TOG* 36(6), DOI 10.1145/3130800.3130804). First serious cGAN-based terrain authoring; ridge/river-line sketch conditioning. Pretrained models released.
+- **Spick, Cowling & Walker, "Procedural Generation using Spatial GANs for Region-Specific Learning of Elevation Data"** (IEEE CoG 2019, DOI 10.1109/CIG.2019.8848120).
+- **Spick & Walker, "Realistic and Textured Terrain Generation using GANs"** (ACM CVMP 2019, DOI 10.1145/3359998.3369407).
+- **Voulgaris, Mademlis & Pitas, "Procedural Terrain Generation Using GANs"** (EUSIPCO 2021, DOI 10.23919/EUSIPCO54536.2021.9616151). cGAN/pix2pix on PoI altitude sketches → satellite imagery.
+- **Argudo, Chica & Andújar, "Terrain Super-resolution through Aerial Imagery and Fully Convolutional Networks"** (*Computer Graphics Forum* 37(2):101–110, 2018, DOI 10.1111/cgf.13345).
+- **Panagiotou & Charou, "Procedural 3D terrain generation using generative adversarial networks"** (2020).
+- **Wulff-Jensen, Rant, Møller, Billeskov, "Deep Convolutional GAN for Procedural 3D Landscape Generation Based on DEM"** (Springer ICEC 2017, DOI 10.1007/978-3-319-76908-0_9).
+- **Ramos, Santos & Dias, "Dual Critic Conditional Wasserstein GAN for Height-Map Generation"** (FDG 2023, DOI 10.1145/3582437.3587183).
+- **Zhang, Li, Zhou, Wang, He, Qin, "Authoring multi-style terrain with global-to-local control"** (*Graphical Models* 2021, DOI 10.1016/j.gmod.2021.101122).
+- **"Multi-theme generative adversarial terrain amplification"** (SIGGRAPH Asia 2019, DOI 10.1145/3355089.3356553).
+- **Gavriil, Muntingh, Barrowclough, "Void filling of digital elevation models with deep generative models"** (*IEEE GRSL* 16(10):1645–1649, 2019).
+
+### 1.3 Procedural / hybrid / classical baselines
+
+- Galin, Guérin, Peytavie, Cordonnier, Cani, Benes, Gain, **"A Review of Digital Terrain Modeling"** (*Computer Graphics Forum* 38(2):553–577, 2019, DOI 10.1111/cgf.13657) — the canonical procedural-vs-simulation-vs-example survey.
+- Génevaux, Galin, Guérin, Peytavie, Benes, **"Terrain Generation Using Procedural Models Based on Hydrology"** (*ACM TOG* 32(4), 2013) — uses **Horton-Strahler-based** rules explicitly.
+- Cordonnier et al., **"Large Scale Terrain Generation from Tectonic Uplift and Fluvial Erosion"** (*CGF* 35(2):165–175, 2016), and **"Forming Terrains by Glacial Erosion"** (*ACM TOG* 42(6), 2023, DOI 10.1145/3618390) — simulation-based, not learned.
+
+### 1.4 Constrained / physics-informed terrain generation
+
+A targeted search returned **no** published terrain generator that imposes hard architectural constraints from mass conservation, Helmholtz decomposition, or PDE-derived priors. The closest claims are:
+- Cordonnier et al.'s erosion-simulation hybrids (physics-based but not generative-deep);
+- TFDM (Yu et al. 2024) uses terrain feature lines as soft guidance only;
+- "PILD: Physics-Informed Learning via Diffusion" (arXiv 2025) is a general framework not applied to DEMs.
+
+**This corroborates the user's claim that hard-constrained generative DEM models are absent from the public literature.**
+
+### 1.5 Hard accounting — runnable artifacts (code + weights + reproducible inference)
+
+| Model | Citation | Year | Architecture | Conditioning / Priors | Code? | Weights? | Reproducible inference? |
+|---|---|---|---|---|---|---|---|
+| TerraFusion | Higo et al., CGI 2025 / VRIH 7(6):560–576; arXiv:2505.04050 | 2025 | Latent diffusion, joint H+T | sketch, text | **Yes** (github.com/millennium-nova/terra-fusion) | Yes (per project page) | Yes |
+| MESA | Borne-Pons et al., CVPR-W MORSE 2025; arXiv:2504.07210 | 2025 | Latent diffusion (Stable Diffusion adapted, 2.5D) | text caption, Copernicus DEM data | **Yes** (github.com/PaulBorneP/MESA) | **Yes** (HuggingFace `NewtNewt/MESA`) | Yes |
+| Terrain Diffusion Network (TDN) | Hu et al., AAAI 2024; arXiv:2308.16725 | 2024 | Multi-level latent diffusion | sketch (rivers/ridges/basins/peaks) | "Will be public" per paper; **status uncertain** | Uncertain | Unverified |
+| Geodiffussr | Inui et al., arXiv:2511.23029 | 2025 | Flow-matching, MCA | DEM features, text | "Plan to release" — not yet | Not yet | No (as of submission) |
+| Terrain Diffusion (Goslin) | Goslin, arXiv:2512.08309 | 2025 | Hierarchical DDPM + InfiniteDiffusion | seed/coords | **Yes** (xandergos.github.io/terrain-diffusion) | Yes | Yes |
+| GrounDiff / PrioStitch | Dhaouadi et al., arXiv:2511.10391 | 2025 | Diffusion (DSM→DTM) | DSM input | **Yes** (deepscenario.github.io/GrounDiff/) | Yes (per project page) | Yes |
+| Diff-DEM | Lo & Peters, *IEEE GRSL* 2024 | 2024 | DDPM (void-filling) | void-containing DEM | **Yes** (github.com/kylelo/Diff-DEM) | Partial | Yes |
+| TFDM | Yu et al., RSE 2024 | 2024 | Diffusion (void-filling) | ridge/valley lines | Not located | No | No |
+| LD-DEM | MDPI *Aerospace* 12(8):658, 2025 | 2025 | Latent diffusion | RGB satellite | Not located | No | No |
+| Lochner et al. (Interactive Authoring) | CGF 2023, DOI 10.1111/cgf.14941 | 2023 | Diffusion (gradient domain) | sketch | Not located | No | No |
+| Beckham & Pal | arXiv:1707.03383 | 2017 | DCGAN + pix2pix | none / pix2pix | **Yes** (github.com/christopher-beckham/gan-heightmaps) | Yes (Theano/Lasagne — legacy framework) | Difficult (legacy) |
+| Guérin et al. (cGAN authoring) | SIGGRAPH Asia 2017 | 2017 | cGAN (pix2pix-style) | ridge/valley sketch | **Yes** (liris.cnrs.fr/eric.guerin/deep-terrains-code-and-data/) | Yes (pretrained) | Yes (legacy frameworks) |
+| Spick & Walker | CVMP 2019; CoG 2019 | 2019 | Spatial GAN | none | Not located | No | No |
+| Voulgaris et al. | EUSIPCO 2021 | 2021 | cGAN (PoI altitude→texture) | sketch | Not located | No | No |
+| Argudo et al. | CGF 2018 | 2018 | FCN super-resolution | aerial imagery | Not located | No | No |
+| Ramos et al. (Dual Critic WGAN) | FDG 2023 | 2023 | WGAN | none | Not located | No | No |
+
+**Hard-constrained architectures (mass conservation / Helmholtz / PDE priors): NONE of the above.** This confirms the user's distinguishing claim.
+
+**Quantitative summary**: of the 10 diffusion-era models (2023–2025) surveyed, exactly 5 have confirmed runnable code+weights (MESA, TerraFusion, GrounDiff, Goslin's Terrain Diffusion, Diff-DEM); TDN status is uncertain; 4 have none. Adding the two GAN-era models with legacy code (Beckham & Pal 2017; Guérin et al. 2017) gives 7 of 16 total surveyed models (≈44%) immediately benchmarkable.
+
+---
+
+## 2. Topological Evaluation of Generative Models — Full History
+
+### 2.1 The Geometry Score lineage
+
+- **Khrulkov & Oseledets, "Geometry Score: A Method for Comparing Generative Adversarial Networks"** (ICML 2018, PMLR v80, pp. 2621–2629; arXiv:1802.02664). Compares geometric/topological properties of real vs. generated manifolds via **Relative Living Times (RLTs)** of 1-dimensional persistent homology groups (extracted from witness complexes on point clouds). Defines Geometry Score = L2 distance between mean RLT vectors. Code: github.com/KhrulkovV/geometry-score.
+
+- **Horak, Yu & Salimi-Khorshidi, "Topology Distance: A Topology-Based Approach for Evaluating Generative Adversarial Networks"** (AAAI 2021, *Proc. AAAI Conf. Artif. Intell.* 35(9):7721–7728, DOI 10.1609/aaai.v35i9.16943; arXiv preprint 2002.12054 dated 2020). Vietoris-Rips on feature embeddings, persistence-diagram differences. Compared against FID/KID/IS/GS.
+
+- **Charlier, State, Hilger, "PHom-GeM: Persistent Homology for Generative Models"** (arXiv:1905.09894, 2019). Bottleneck distance for VAE/GAN/AE evaluation on financial tabular data.
+
+- **Barannikov et al., "Manifold Topology Divergence: a Framework for Comparing Data Manifolds"** (NeurIPS 2021).
+
+- **Kim, Jang, Kim, Yoo, "TopP&R: Robust Support Estimation Approach for Evaluating Fidelity and Diversity in Generative Models"** (NeurIPS 2023, arXiv:2306.08013). Topological-and-statistically-significant support estimation; precision/recall variant.
+
+- **Sykes, Simon, Rabin, "Unifying and extending Precision Recall metrics for assessing generative models"** (2024, arXiv:2405.01611).
+
+- **Corradini et al. (2025), "Training dynamics of GANs through the lens of persistent homology"** (*Neurocomputing*).
+
+- **Suresh et al., "Evaluating Generative Models via Cubical Homology based Persistent Entropy"** (KDD 2025, DOI 10.1145/3711896.3736943). Cubical homology + persistent entropy on generated images — methodologically the closest precedent for an image-grid-like (and therefore heightmap-grid-like) evaluation pipeline.
+
+- **Wong et al., "Towards Scalable Topological Regularizers"** (arXiv:2501.14641, 2025). Principal persistence measures (sub-sampled) as a scalable topological regularizer; demonstrated on GAN training.
+
+- **TopoGAN: A Topology-Aware Generative Adversarial Network** (Wang, Liu, Samaras, Chen; ECCV 2020).
+
+### 2.2 Domain-specific topological evaluation of generators
+
+- **Medical imaging:** Clough et al., "A Topological Loss Function for Deep-Learning based Image Segmentation Using Persistent Homology" (*IEEE TPAMI* 2020, DOI 10.1109/TPAMI.2020.3013679; arXiv:1910.01877). Hu et al., "Topology-Preserving Deep Image Segmentation" (NeurIPS 2019). Stucki et al., "Topologically faithful multi-class segmentation" (NeurIPS 2023; arXiv:2403.11001). PI-Att (Erden et al., arXiv:2408.08038).
+
+- **Point clouds / 3D shape:** Hu et al., "Topology-Aware Latent Diffusion for 3D Shape Generation" (arXiv:2401.17603, 2024). Kudeshia & Poovvancheri, "Learning Significant Persistent Homology Features for 3D Shape Understanding" (arXiv:2602.14228, preprint).
+
+- **Molecular / drug discovery:** Schiff, Ramamurthy, Chenthamarakshan, Das, "Characterizing the Latent Space of Molecular Deep Generative Models with Persistent Homology Metrics" (arXiv:2010.08548, 2020). "Augmenting Molecular Deep Generative Models with TDA Representations" (arXiv:2106.04464, 2021). MacroGuide (arXiv:2602.14977; preprint).
+
+- **Cosmology / N-body emulators:** Pranav et al., "Persistent homology of the cosmic web — I" (*MNRAS* 507(2):2968, 2021; arXiv:2011.12851). Sousbie, "The persistent cosmic web and its filamentary structure" (DisPerSE; arXiv:1009.4015, 2010). Heydenreich et al., "Persistent homology in cosmic shear: Constraining parameters with topological data analysis" (*A&A* 2021, arXiv:2007.13724). Biagetti, Cole, Shiu, "Topological Echoes of Primordial Physics in the Universe at Large Scales" (arXiv:2012.03616, 2020). Yip, Rouhiainen, Shiu, "Learning from Topology: Cosmological Parameter Estimation" (arXiv:2308.02636, 2023). "Cosmology with Persistent Homology: Parameter Inference via Machine Learning" (arXiv:2412.15405, 2024). These use PH to **compare** density-field maps and **emulators** — the closest analog template.
+
+- **Materials science:** Saadatfar et al., *Nature Communications*; Hiraoka et al., *PNAS* — PH for porous materials and microstructure (Adams et al. 2017 persistence images was motivated partly by this).
+
+### 2.3 Has anyone done it for terrain?
+
+**No.** The dedicated targeted search confirmed that no published paper applies persistence-based distributional tests to evaluate generative DEM/terrain models. The novelty claim is defensible.
+
+---
+
+## 3. TDA Applied to Terrain / DEMs — Full History
+
+### 3.1 Foundational (Morse theory and persistence on scalar fields)
+
+- Edelsbrunner, Harer & Zomorodian, **"Hierarchical Morse-Smale Complexes for Piecewise Linear 2-Manifolds"** (*Discrete & Computational Geometry* 30:87–107, 2003).
+- Edelsbrunner, Letscher & Zomorodian, **"Topological Persistence and Simplification"** (FOCS 2000; *DCG* 28:511–533, 2002).
+- Cohen-Steiner, Edelsbrunner, Harer, **"Stability of Persistence Diagrams"** (SoCG 2005; *DCG* 37:103–120, 2007).
+- Agarwal, Edelsbrunner, Harer, Wang, **"Extreme Elevation on a 2-Manifold"** (SoCG 2004; *DCG* 36(4):553–572, 2006).
+- Edelsbrunner & Morozov, **"Persistent Homology"** chapter in the *Handbook of Discrete and Computational Geometry* — uses topographic prominence as the canonical example of persistence.
+- Robins, Wood, Sheppard (2011) — discrete Morse theory for computing persistence on cubical complexes.
+
+### 3.2 PH/Morse-theory directly on DEMs
+
+- Fellegara, De Floriani, Weiss, **"Efficient Computation and Simplification of Discrete Morse Decompositions on Triangulated Terrains"** (ACM SIGSPATIAL 2014).
+- Čomić, De Floriani, Papaleo, **"Morse-Smale decompositions for modeling terrain knowledge"** (Springer COSIT 2005).
+- Kerber et al., **"Topology-Preserving Terrain Simplification"** (arXiv:1912.03032). PH-driven simplification of DEMs.
+- Syzdykbayev, Karimi & Karimi, **"Persistent homology on LiDAR data to detect landslides"** (*Remote Sensing of Environment* 246:111816, 2020, DOI 10.1016/j.rse.2020.111816). Closest published PH-on-terrain-features paper to a karst/geomorphology application.
+- Wu, Deng, Chen, **"Automated delineation of karst sinkholes from LiDAR-derived DEMs"** (*Geomorphology* 266:1–10, 2016).
+- "The Discrete Morse Complex of Images: Algorithms, Modeling and Applications" (Dagstuhl OASIcs iPMVM 2020, DOI 10.4230/OASIcs.iPMVM.2020.18).
+- Cousty, Bertrand et al. — watershed via discrete Morse / pseudomanifolds.
+
+### 3.3 Karst / drainage / hydrology
+
+- Collon, Bernasconi, Vuilleumier, Renard (2017), **"Statistical metrics for the characterization of karst network geometry and topology"** (*Geomorphology* 283:122–142). Graph-theoretic.
+- Jouves et al. (2017), **"Speleogenesis, geometry, and topology of caves: A quantitative study of 3D karst conduits"** (*Geomorphology* 298:86–106).
+- Suzuki et al. (2021), **"Flow estimation solely from image data through persistent homology analysis"** (PMC8429714). Fracture/pore networks.
+- Eryilmaz, Katar, Little (preprint arXiv:2510.17735, 2026), **"Flow-Aware Ellipsoidal Filtration for Persistent Homology of Recurrent Signals."** Anisotropic filtrations — methodologically relevant for designing the proposed flow-accumulation filtration.
+
+### 3.4 Flow accumulation as a filtration
+
+No paper was located that explicitly uses **flow accumulation** as the **filtration function** for sublevel/superlevel-set persistent homology on a DEM. This is — separately from the evaluation framing — a novel methodological move, with the closest precedents being (i) drainage-network graph spectra (Saberi-Movahed et al., *Scientific Reports* 7:11579, 2017), (ii) topology of channel networks via persistence on streamflow (Madini et al. 2019, AIP Conf. Proc.), and (iii) Sousbie's DisPerSE which uses density-field filtrations on cosmic webs (formally analogous).
+
+---
+
+## 4. Drainage Network / Flow Accumulation Topology
+
+- **Horton (1945)**, **Strahler (1952, 1957)** — foundational stream-order statistics; Horton-Strahler bifurcation ratios, length ratios.
+- **Tokunaga (1978)** — Tokunaga side-branch ratios.
+- **Hack (1957)** — length-area scaling.
+- **Rodríguez-Iturbe & Rinaldo, *Fractal River Basins*** (Cambridge UP, 1997). Foundational text on optimal channel networks.
+- **Saberi-Movahed et al., "Emergent spectral properties of river network topology: an optimal channel network approach"** (*Scientific Reports* 7:11579, 2017).
+- **Tejedor et al.** — delta channel-network graph-theoretic analyses (multiple papers, *Water Resources Research* 2015+).
+- **Toroczkai, "On the topological classification of binary trees using the Horton-Strahler index"** (cond-mat/0108448, 2001).
+- **Peca-Medlin, "The Horton-Strahler number of butterfly trees"** (arXiv:2509.11384). Recent distributional analysis.
+
+**Connection between thresholding flow accumulation and superlevel-set filtration:** the standard hydrology workflow (threshold flow accumulation → extract channels → compute Strahler) is **formally equivalent** to a superlevel-set filtration parameterized by accumulation threshold; the persistence diagram of (DEM, flow_accumulation) under that filtration tracks the **birth/death of stream segments as the threshold sweeps** — and **no paper publishes this explicitly** as far as searches reveal. This is one of the cleanest novel contributions.
+
+---
+
+## 5. Current Evaluation Methodology for Generative Terrain Models
+
+What current papers report:
+- **FID / CLIP-FID** (TerraFusion, MESA, Geodiffussr) — Inception/CLIP features pretrained on natural images, on heightmap data they have no theoretical basis. Critique in Kim et al. (NeurIPS 2023, TopP&R, verbatim): "Existing metrics, such as Inception Score (IS), Fréchet Inception Distance (FID), and various Precision and Recall (P&R) variants, rely heavily on support estimates derived from sample features. However, the reliability of these estimates has been overlooked… current methods not only fail to accurately assess sample quality when support estimation is unreliable, but also yield inconsistent results."
+- **LPIPS, SSIM, MS-SSIM, MSE, RMSE** (Geodiffussr, Diff-DEM, GrounDiff).
+- **Slope / elevation histograms** (Zhang et al. 2022, MDPI *Remote Sensing*; Voulgaris et al. EUSIPCO 2021).
+- **Pearson / distance correlation between heightmap and texture** (Geodiffussr, TerraFusion).
+- **Perceptual user studies** (Sluijter; Wulff-Jensen et al. 2018; Rai et al. ICAI VR&AI 2024).
+- **Rajasekaran, Kang, Čadík, Galin, Guérin, Peytavie, Slavík, Benes, "PTRM: Perceived Terrain Realism Metric"** (*ACM Trans. Appl. Percept.* 19(2), Article 6, July 2022, DOI 10.1145/3514244). Geomorphons distribution + deep features. The most sophisticated existing terrain-specific metric, still not topological.
+
+**Critiques in the literature:** Galin et al. (2019) note the evaluation gap explicitly. TDN (Hu et al. AAAI 2024) acknowledges the trade-off between fidelity and user-control divergence. Terrain Diffusion (Goslin 2025) reports preserved hydrology but does not measure it. **No paper has critiqued FID-for-terrain quantitatively.** The user's paper would be the first.
+
+---
+
+## 6. Differentiable Persistent Homology (Training-Time Use)
+
+- **Hofer, Kwitt, Niethammer, Uhl, "Deep Learning with Topological Signatures"** (NeurIPS 2017; arXiv:1707.04041). Input-layer treatment of PDs.
+- **Brüel-Gabrielsson, Nelson, Dwaraknath, Skraba, Guibas, Carlsson, "A Topology Layer for Machine Learning"** (AISTATS 2020, PMLR v108:1553–1563; arXiv:1905.12200). Code: github.com/bruel-gabrielsson/TopologyLayer. Explicitly designed to add topological priors to generative networks.
+- **Carrière, Chazal, Ike, Lacombe, Royer, Umeda, "PersLay: A Neural Network Layer for Persistence Diagrams"** (AISTATS 2020, PMLR v108:2786–2796; arXiv:1904.09378). General DeepSets-style vectorization layer for PDs.
+- **Carrière et al. (2021)** — differentiable PH for cubical filtrations; convergence guarantees for stochastic subgradient descent on persistence-based functions.
+- **TopoDiffusionNet (Hu et al. 2024, arXiv:2410.16646)** — topology-aware diffusion guidance via persistence.
+- **Stucki et al., "Topologically faithful image segmentation via induced matching of persistence barcodes"** (NeurIPS 2023).
+- **Towards Scalable Topological Regularizers** (Wong et al. arXiv:2501.14641, 2025) — practical scalable variant for adversarial training.
+
+---
+
+## 7. Persistence-Based Distributional Testing
+
+- **Adams et al., "Persistence Images: A Stable Vector Representation of Persistent Homology"** (*JMLR* 18(8):1–35, 2017; arXiv:1507.06217).
+- **Carrière, Cuturi, Oudot, "Sliced Wasserstein Kernel for Persistence Diagrams"** (ICML 2017, PMLR v70:664–673; arXiv:1706.03358). The natural kernel for two-sample tests on PDs.
+- **Bubenik, "Statistical topology data analysis using persistence landscapes"** (*JMLR* 16, 2015).
+- **Chazal, Fasy, Lecci, Rinaldo, Wasserman, "Stochastic Convergence of Persistence Landscapes and Silhouettes"** (arXiv:1312.0308, 2014).
+- **Fasy, Lecci, Rinaldo, Wasserman, Balakrishnan, Singh, "Confidence sets for persistence diagrams"** (*Annals of Statistics* 42(6):2301–2339, 2014; arXiv:1303.7117). Bootstrap confidence bands.
+- **Robinson & Turner, "Hypothesis testing for topological data analysis"** (*J. Applied & Computational Topology*, 2017). Permutation tests for PD populations.
+- **Gretton et al., "A Kernel Two-Sample Test"** (*JMLR* 13:723–773, 2012). Underlying MMD machinery.
+- **Janthial & Lacombe, "Revisiting the Sliced Wasserstein Kernel for Persistence Diagrams: a Figalli-Gigli approach"** (arXiv:2602.06539, preprint). Recent refinement.
+- **Bobrowski & Mukherjee** — random complexes and asymptotic distributions of PD points.
+
+---
+
+## 8. Adjacent Domains — Topological Evaluation Frames That Transfer
+
+- **Cosmology (most transferable):** sublevel-set/Delaunay PH on density fields, Betti curves, persistence images. Used to **constrain cosmological parameters from cosmic shear** (Heydenreich et al. *A&A* 2021), **detect primordial non-Gaussianity** (Biagetti, Cole, Shiu 2020), **compare ΛCDM simulations** (Pranav et al. *MNRAS* 2021), and **emulate cosmological maps** with GANs (Perraudin et al. 2019; Tamosiunas et al. 2020). The persistence-image+CNN inference pipeline (Yip et al. 2023; arXiv:2412.15405) is directly portable to DEMs.
+
+- **Medical imaging:** Topology-as-correctness frame; PD-based losses. Hu et al. NeurIPS 2019, Clough et al. *TPAMI* 2020, Stucki et al. NeurIPS 2023, PI-Att (Erden et al. 2024).
+
+- **Molecular generation:** PH on point clouds in 3D space; Schiff et al. 2020; MacroGuide 2026 preprint.
+
+- **Materials microstructure:** Saadatfar et al., *Nature Communications*; Hiraoka et al., *PNAS*.
+
+- **Climate / atmosphere:** Strommen et al. and Muszynski et al. — PH for atmospheric blocking, cyclone tracking, but evaluation of generative weather models with PH remains nascent.
+
+**Transferability assessment:** the cosmology and medical-imaging frames transfer with minimal modification. The novelty for terrain is the **choice of filtration function** (flow accumulation as opposed to density or signed-distance), which embeds geomorphologically meaningful invariants (drainage hierarchy, basin connectivity) into the persistence diagram.
+
+---
+
+## Recommendations
+
+1. **Position the paper explicitly as the bridge** between the TDA-evaluation-of-generators literature (Khrulkov-Oseledets 2018; Horak et al. AAAI 2021; Barannikov et al. NeurIPS 2021; Suresh et al. KDD 2025) and the TDA-on-terrain literature (Edelsbrunner-Harer-Zomorodian 2003; Agarwal et al. 2006; Kerber 2019; Syzdykbayev et al. 2020). Frame the proposed flow-accumulation filtration as a domain-aware filtration choice, citing Eryilmaz et al. (2026 preprint) as precedent for anisotropic/flow-aware filtrations.
+
+2. **Benchmark the runnable set as the empirical core:**
+   - **Tier 1 (full runnability, prioritize):** MESA, TerraFusion, GrounDiff, Goslin's Terrain Diffusion, Diff-DEM, Guérin 2017, Beckham & Pal 2017.
+   - **Tier 2 (uncertain, verify):** TDN (verify code release), Geodiffussr (not yet released).
+   - **Tier 3 (rebuild required, deprioritize):** Spick & Walker, Voulgaris, Argudo, Ramos, TFDM, LD-DEM.
+   - **Threshold to add a model:** working unconditional inference producing ≥256×256 heightmaps in <10 min on a single A100.
+
+3. **Statistical framing.** Use sliced-Wasserstein MMD (Carrière-Cuturi-Oudot 2017) plus permutation testing (Robinson & Turner 2017) on populations of persistence diagrams per generator. Report bootstrap confidence bands (Fasy et al. 2014) and a primary scalar (e.g., sliced-Wasserstein-MMD on the H0 diagram of the flow-accumulation superlevel-set filtration) plus secondary geomorphometric scalars (Horton-Strahler bifurcation ratios, Hack's law exponent, hypsometric integral).
+
+4. **Pre-empt referee objections:**
+   - "Why not just FID?" — Compute and report FID/CLIP-FID alongside, then show that two terrains with identical FID can have wildly different drainage topology (visual + PH demo). Cite Kim et al. NeurIPS 2023 verbatim on FID's known instability.
+   - "Why flow accumulation?" — Show that elevation-superlevel-set PH conflates ridges and peaks of equal height but distinguishes drainage hierarchies poorly compared to flow-accumulation filtration.
+   - "Differentiable extension?" — Cite Brüel-Gabrielsson et al. 2020 + Carrière et al. 2021 to demonstrate the loss can be made trainable; defer empirical training-time use to future work.
+
+5. **Confirm the constrained-architecture novelty claim** by reading the TFDM (Yu et al. 2024) full text — its "terrain-feature-guided" design is the closest extant model to a constrained one. If TFDM's guidance is soft (which the abstract strongly suggests), the user's hard-constraint claim survives.
+
+6. **Cite the published karst/landslide-topology precedents** (Syzdykbayev et al., *RSE* 2020; Wu et al., *Geomorphology* 2016) when grounding the protocol in geomorphology-domain TDA work.
+
+## Caveats
+
+- The arXiv IDs 2602.06539, 2602.14228, 2602.14977, 2604.04299 appear to be **future-dated preprints** (2026); they are real arXiv records but should be treated as preprints in submission.
+- "Hard-constrained" claim depends on a precise definition. If the user means architecture-level enforcement (e.g., projection onto divergence-free subspace, exact mass conservation, Helmholtz-decomposition-based parameterization), no surveyed model qualifies. If they mean any physics-informed soft guidance, TFDM (Yu et al. 2024) and erosion-simulation hybrids (Cordonnier et al. 2017, 2023) are partial counterexamples.
+- The Khrulkov-Oseledets Geometry Score uses **witness complexes on point clouds**, not sublevel-set filtrations on scalar fields. The proposed approach is methodologically closer to cosmology (sublevel-set filtrations of density) than to GS, and this should be made explicit when positioning.
+- The TDN code-release status (claimed in the AAAI 2024 paper as "will be public") could not be verified at submission time; users planning to benchmark it should account for the possibility it remains unreleased.
+- Horak et al.'s Topology Distance is most commonly cited as a 2020 arXiv preprint (arXiv:2002.12054) but the peer-reviewed venue is AAAI 2021 (Proceedings of the AAAI Conference on Artificial Intelligence 35(9):7721–7728, DOI 10.1609/aaai.v35i9.16943); use the AAAI 2021 citation for the manuscript.

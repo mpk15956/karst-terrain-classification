@@ -1,0 +1,24 @@
+.git
+.github
+.gitignore
+.claude
+.vscode
+.idea
+.pixi
+.conda
+**/__pycache__
+**/*.py[cod]
+**/.ipynb_checkpoints
+**/*.egg-info
+
+# Bulk artifacts that shouldn't enter the build context
+docs/
+notebooks/
+data/
+src/earthscape-main/data/
+src/drp_2025fall/npHeightMatrix/
+*.pdf
+*.tif
+*.tiff
+*.npy
+
