@@ -120,6 +120,10 @@ test = { cmd = "pytest -q", description = "Unit tests." }
 spike-filtration = { cmd = "python scripts/spike_filtration.py", description = "Phase 0 filtration-orientation spike. Validates the donor-based union-find on D8 flow graph against cubical 8-adjacency and superlevel-decreasing negative controls on three toy DEMs (Y, tributary-contact, meander-neck). Seconds." }
 validity-test = { cmd = "pytest -q tests/test_topo_eval", description = "Phase B: run the merge-tree validity test suite (toys, adjacency, falsification, structural invariants, persistence). Seconds." }
 validity-toys = { cmd = "python scripts/validity_toys.py", description = "Phase B: produce the toy validity figures (toy zoo, adjacency contamination, falsification witness) into figures/validity/toys/. Seconds." }
+validity-real = { depends-on = ["validity-real-ceiling", "validity-real-construct"], description = "Phase C: ceiling calibration then PH-vs-NHD construct validity. Network + compute. Use --quick via the underlying scripts for a smoke run." }
+validity-real-ceiling = { cmd = "python scripts/validity_real_ceiling.py", description = "Phase C: whitebox-vs-NHD agreement ceiling on held-out tiles. Network + compute." }
+validity-real-construct = { cmd = "python scripts/validity_real_construct.py", description = "Phase C: PH-donor-graph-vs-NHD construct validity, thresholds relative to the ceiling. Network + compute." }
+validity-probe = { cmd = "python scripts/validity_real_probe.py", description = "Phase C: FID-blind found-pairs probe (Milestone 1.5 diagnostic). Network + compute." }
 lab = { cmd = "jupyter lab --no-browser --ip=0.0.0.0 --port=8888", description = "Run JupyterLab in the foreground." }
 kernel = { cmd = "python -m ipykernel install --user --name karst-terrain --display-name 'Karst Terrain (pixi)'", description = "Register a Jupyter kernel for this env." }
 
