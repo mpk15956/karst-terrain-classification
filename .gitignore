@@ -22,6 +22,14 @@ dist/
 
 # Bulk data that should not be committed
 /data/earthscape/
+/data/dem/
+/data/nhd/
+/data/raw/
+/data/processed/
+
+# Keep small results summaries (JSON) tracked; ignore large rasters
+results/**/*.tif
+results/**/*.tiff
 
 # OS noise
 .DS_Store
