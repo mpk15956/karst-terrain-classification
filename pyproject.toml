@@ -118,6 +118,8 @@ cpu = { features = ["cpu"], solve-group = "cpu" }
 smoke = { cmd = "python scripts/smoke.py", description = "Smoke test (seconds, laptop). Validates the pipeline runs." }
 test = { cmd = "pytest -q", description = "Unit tests." }
 spike-filtration = { cmd = "python scripts/spike_filtration.py", description = "Phase 0 filtration-orientation spike. Validates the donor-based union-find on D8 flow graph against cubical 8-adjacency and superlevel-decreasing negative controls on three toy DEMs (Y, tributary-contact, meander-neck). Seconds." }
+validity-test = { cmd = "pytest -q tests/test_topo_eval", description = "Phase B: run the merge-tree validity test suite (toys, adjacency, falsification, structural invariants, persistence). Seconds." }
+validity-toys = { cmd = "python scripts/validity_toys.py", description = "Phase B: produce the toy validity figures (toy zoo, adjacency contamination, falsification witness) into figures/validity/toys/. Seconds." }
 lab = { cmd = "jupyter lab --no-browser --ip=0.0.0.0 --port=8888", description = "Run JupyterLab in the foreground." }
 kernel = { cmd = "python -m ipykernel install --user --name karst-terrain --display-name 'Karst Terrain (pixi)'", description = "Register a Jupyter kernel for this env." }
 
