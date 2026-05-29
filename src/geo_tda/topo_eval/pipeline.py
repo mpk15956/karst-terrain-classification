@@ -7,6 +7,7 @@ Used by the three validity_real_* scripts.
 from __future__ import annotations
 
 import logging
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -215,40 +216,46 @@ def process_tile(
         error field is set and the rest are None.
     """
     dem_path = Path(dem_path)
+    tmp_window: Path | None = None
     try:
-        bbox = _tile_bbox_from_raster(dem_path)
+        # Window at the RASTER level (crop once), so whitebox and PH run on
+        # the identical small tile. Cropping the input rather than the
+        # post-whitebox arrays keeps the two sides consistent and makes the
+        # whitebox side laptop-runnable too (a full 1-degree tile is heavy
+        # for whitebox and impossible for the pure-Python union-find).
+        run_path = dem_path
+        if window is not None:
+            tmp_window = _crop_dem_to_window(dem_path, window)
+            if tmp_window is not None:
+                run_path = tmp_window
+
+        bbox = _tile_bbox_from_raster(run_path)
         area = _tile_area_km2(bbox)
         result = TileResult(key=key, bbox=bbox)
 
-        if include_ph or include_whitebox:
+        if include_ph:
             from geo_tda.topo_eval.hydrology import d8_pointer_and_accumulation
             from geo_tda.topo_eval.merge_tree import merge_tree_from_accumulation
             from geo_tda.topo_eval.summaries import h1_cubical_mask
 
             receiver_codes, accumulation = d8_pointer_and_accumulation(
-                dem_path, workdir=workdir
+                run_path, workdir=workdir
             )
-            if window is not None:
-                receiver_codes, accumulation = _center_window(
-                    receiver_codes, accumulation, window
-                )
             mask = accumulation >= tau_channel
             channel_cells = int(mask.sum())
             cell_km = _cell_km(bbox, accumulation.shape)
-
-            if include_ph:
-                tree = merge_tree_from_accumulation(
-                    receiver_codes, accumulation, tau_channel
-                )
-                result.ph = stats_from_merge_tree(
-                    tree, area_km2=area,
-                    channel_cell_count=channel_cells, cell_km=cell_km,
-                )
-                result.h1_cubical = int(h1_cubical_mask(mask))
+            tree = merge_tree_from_accumulation(
+                receiver_codes, accumulation, tau_channel
+            )
+            result.ph = stats_from_merge_tree(
+                tree, area_km2=area,
+                channel_cell_count=channel_cells, cell_km=cell_km,
+            )
+            result.h1_cubical = int(h1_cubical_mask(mask))
 
         if include_whitebox:
             result.whitebox = _whitebox_branching_stats(
-                dem_path, tau_channel, area, workdir
+                run_path, tau_channel, area, workdir
             )
 
         if nhd_geojson is not None:
@@ -258,16 +265,43 @@ def process_tile(
     except Exception as exc:  # noqa: BLE001 - per-tile isolation; report, don't crash the batch
         logger.warning("tile %s failed: %s", key, exc)
         return TileResult(key=key, bbox=(0, 0, 0, 0), error=str(exc))
+    finally:
+        if tmp_window is not None and tmp_window.exists():
+            tmp_window.unlink()
 
 
-def _center_window(receiver_codes, accumulation, window):
-    H, W = accumulation.shape
-    if window >= H and window >= W:
-        return receiver_codes, accumulation
-    i0 = max(0, (H - window) // 2)
-    j0 = max(0, (W - window) // 2)
-    sl = (slice(i0, i0 + window), slice(j0, j0 + window))
-    return receiver_codes[sl].copy(), accumulation[sl].copy()
+def _crop_dem_to_window(dem_path: Path, window: int) -> Path | None:
+    """Write a centered window x window crop of a DEM to a temp GeoTIFF.
+
+    Returns the temp path, or None if the DEM is already <= window in both
+    dimensions (no crop needed). The crop preserves CRS and writes a
+    correct transform so downstream bbox/area are accurate for the window.
+    """
+    import rasterio
+    from rasterio.windows import Window
+
+    with rasterio.open(dem_path) as src:
+        H, W = src.height, src.width
+        if window >= H and window >= W:
+            return None
+        i0 = max(0, (H - window) // 2)
+        j0 = max(0, (W - window) // 2)
+        h = min(window, H)
+        w = min(window, W)
+        win = Window(j0, i0, w, h)
+        data = src.read(1, window=win)
+        transform = src.window_transform(win)
+        profile = src.profile.copy()
+        profile.update(height=h, width=w, transform=transform, count=1)
+
+    fd, tmp_name = tempfile.mkstemp(prefix="dem_window_", suffix=".tif")
+    import os
+
+    os.close(fd)
+    tmp_path = Path(tmp_name)
+    with rasterio.open(tmp_path, "w", **profile) as dst:
+        dst.write(data, 1)
+    return tmp_path
 
 
 def _cell_km(bbox, shape) -> float:

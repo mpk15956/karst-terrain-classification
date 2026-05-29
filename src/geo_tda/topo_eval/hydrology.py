@@ -65,6 +65,71 @@ def _read_single_band(path: Path) -> np.ndarray:
         return src.read(1)
 
 
+def _checked(wbt, tool_name: str, fn, output: Path) -> None:
+    """Run a whitebox tool and raise if it did not write its output.
+
+    Whitebox returns 0 on success but with verbose off it swallows errors;
+    a missing output file is the reliable failure signal. On real tiles
+    breach/fill can fail silently (nodata, unreadable COG, memory), and a
+    silent failure cascades into a confusing downstream "no such file".
+    Surface it here, loudly, naming the tool.
+    """
+    rc = fn()
+    if not output.exists():
+        raise RuntimeError(
+            f"whitebox {tool_name} produced no output at {output} "
+            f"(return code {rc}). Likely an unreadable input, nodata, or "
+            f"resource limit; rerun with wbt.verbose=True to see the cause."
+        )
+
+
+def _condition_and_route(
+    dem_path: Path, condition: str, workdir: Path
+) -> tuple[Path, Path, Path]:
+    """Shared step: breach/fill, then D8 pointer and accumulation.
+
+    Returns (conditioned, pointer, accum) paths. Used by both
+    d8_pointer_and_accumulation (the PH side) and whitebox_strahler (the
+    ceiling side) so the two sides condition identically.
+    """
+    import whitebox
+
+    wbt = whitebox.WhiteboxTools()
+    wbt.set_working_dir(str(workdir))
+    wbt.verbose = False
+
+    conditioned = workdir / "conditioned.tif"
+    if condition == "breach":
+        _checked(
+            wbt, "breach_depressions_least_cost",
+            lambda: wbt.breach_depressions_least_cost(
+                str(dem_path), str(conditioned), dist=100
+            ),
+            conditioned,
+        )
+    elif condition == "fill":
+        _checked(
+            wbt, "fill_depressions",
+            lambda: wbt.fill_depressions(str(dem_path), str(conditioned)),
+            conditioned,
+        )
+    else:
+        raise ValueError(f"condition must be 'breach' or 'fill', got {condition!r}")
+
+    pointer = workdir / "pointer.tif"
+    accum = workdir / "accum.tif"
+    _checked(
+        wbt, "d8_pointer",
+        lambda: wbt.d8_pointer(str(conditioned), str(pointer)), pointer,
+    )
+    _checked(
+        wbt, "d8_flow_accumulation",
+        lambda: wbt.d8_flow_accumulation(str(conditioned), str(accum), out_type="cells"),
+        accum,
+    )
+    return conditioned, pointer, accum
+
+
 def d8_pointer_and_accumulation(
     dem_path: str | Path,
     *,
@@ -85,30 +150,12 @@ def d8_pointer_and_accumulation(
         D8_OFFSETS, ready for merge_tree_from_accumulation; accumulation is
         the D8 flow accumulation field (cell counts).
     """
-    import whitebox
-
     dem_path = Path(dem_path).resolve()
     owns_tmp = workdir is None
     workdir = Path(tempfile.mkdtemp(prefix="wbt_")) if owns_tmp else Path(workdir)
     workdir.mkdir(parents=True, exist_ok=True)
 
-    wbt = whitebox.WhiteboxTools()
-    wbt.set_working_dir(str(workdir))
-    wbt.verbose = False
-
-    conditioned = workdir / "conditioned.tif"
-    if condition == "breach":
-        wbt.breach_depressions_least_cost(str(dem_path), str(conditioned), dist=100)
-    elif condition == "fill":
-        wbt.fill_depressions(str(dem_path), str(conditioned))
-    else:
-        raise ValueError(f"condition must be 'breach' or 'fill', got {condition!r}")
-
-    pointer = workdir / "pointer.tif"
-    accum = workdir / "accum.tif"
-    wbt.d8_pointer(str(conditioned), str(pointer))
-    wbt.d8_flow_accumulation(str(conditioned), str(accum), out_type="cells")
-
+    _conditioned, pointer, accum = _condition_and_route(dem_path, condition, workdir)
     pointer_arr = _read_single_band(pointer)
     accum_arr = _read_single_band(accum)
     receiver_codes = pointer_to_receiver_codes(pointer_arr)
@@ -143,22 +190,22 @@ def whitebox_strahler(
     workdir = Path(tempfile.mkdtemp(prefix="wbt_")) if owns_tmp else Path(workdir)
     workdir.mkdir(parents=True, exist_ok=True)
 
+    _conditioned, pointer, accum = _condition_and_route(dem_path, condition, workdir)
+
     wbt = whitebox.WhiteboxTools()
     wbt.set_working_dir(str(workdir))
     wbt.verbose = False
 
-    conditioned = workdir / "conditioned.tif"
-    if condition == "breach":
-        wbt.breach_depressions_least_cost(str(dem_path), str(conditioned), dist=100)
-    else:
-        wbt.fill_depressions(str(dem_path), str(conditioned))
-
-    pointer = workdir / "pointer.tif"
-    accum = workdir / "accum.tif"
     streams = workdir / "streams.tif"
     strahler = workdir / "strahler.tif"
-    wbt.d8_pointer(str(conditioned), str(pointer))
-    wbt.d8_flow_accumulation(str(conditioned), str(accum), out_type="cells")
-    wbt.extract_streams(str(accum), str(streams), threshold=threshold)
-    wbt.strahler_stream_order(str(pointer), str(streams), str(strahler))
+    _checked(
+        wbt, "extract_streams",
+        lambda: wbt.extract_streams(str(accum), str(streams), threshold=threshold),
+        streams,
+    )
+    _checked(
+        wbt, "strahler_stream_order",
+        lambda: wbt.strahler_stream_order(str(pointer), str(streams), str(strahler)),
+        strahler,
+    )
     return _read_single_band(strahler)
