@@ -1,14 +1,47 @@
 # Topological evaluation of generative terrain models
 
-**Status (2026-05-26):** Framing locked to methods after four rounds
-of plan revision against referee-style review. Filtration locked to
-sublevel-increasing on the channel mask, donor-based union-find on
-the D8 flow graph. Phase 0 spike PASS (9/9 toy assertions per
-[docs/topo_eval/notes/orientation_spike.md](topo_eval/notes/orientation_spike.md)).
-Novelty-collision check cleared per
-[docs/topo_eval/notes/folklore_check.md](topo_eval/notes/folklore_check.md).
-Operational pre-commits in [docs/topo_eval/_evaluation_conventions.md](topo_eval/_evaluation_conventions.md).
-Phase A drafting (proof) can begin.
+**Status (2026-05-29).** Phases 0, A, B end-to-end; Phase C code
+complete with the end-to-end real-tile smoke passing. Summary:
+
+- **Phase 0 (methodology pre-commits + filtration spike).** Framing
+  locked to methods, filtration locked to sublevel-increasing on the
+  channel mask with donor-based union-find on the D8 flow graph.
+  Spike 9/9 toy assertions per
+  [docs/topo_eval/notes/orientation_spike.md](topo_eval/notes/orientation_spike.md);
+  novelty-collision check cleared per
+  [docs/topo_eval/notes/folklore_check.md](topo_eval/notes/folklore_check.md);
+  operational pre-commits in
+  [docs/topo_eval/_evaluation_conventions.md](topo_eval/_evaluation_conventions.md).
+- **Phase A (proof).** Drafted at
+  [docs/topo_eval/proofs/strahler_merge_tree.qmd](topo_eval/proofs/strahler_merge_tree.qmd):
+  setup, bijection Lemma, three theorems (Strahler-as-coarsening,
+  PD-coarsening loss with the equal-birth four-leaf witness,
+  field-level stability with the catchment-capture counterexample),
+  discussion sub-cases, and the load-bearing elevation-contrast
+  section §7. Three referee repairs applied (per-basin abelianization
+  over the forest, Fact-C closure in the Lemma sweep, arity
+  convention in Theorem 1).
+- **Phase B (toys + tests + figures).** `src/geo_tda/topo_eval/`
+  implements the donor-graph construction; 36 fast tests plus 3 slow
+  hydrology tests all pass (`pixi run validity-test`). Three figures
+  under `figures/validity/toys/` (`pixi run validity-toys`): the
+  confirmatory toy zoo with Strahler annotations, the meander-neck
+  adjacency-contamination panel (H₁=0 donor vs H₁=8 cubical), and the
+  Theorem-2 falsification witness (identical H₀ barcodes over
+  divergent Strahler distributions).
+- **Phase C (real-DEM construct validity).** End-to-end pipeline:
+  3DEP DEM acquisition via planetary_computer + NHD flowline vectors
+  via the USGS hydrography service, whitebox conditioning + D8 routing
+  + stream extraction, donor-graph merge tree, snapped-graph Strahler
+  on both NHD and whitebox stream vectors so all three sides count
+  network elements consistently. Smoke run on one real tile (n35w086,
+  Cumberland Plateau) committed at
+  `results/validity/ceiling.json`; the full 20- to 100-tile run is
+  the deferred Sapelo2 path because the pure-Python donor union-find
+  does not scale to a full ~13M-cell 1-degree tile on a laptop. A
+  `--window N` flag (`--quick` implies `--window 512`) crops at the
+  raster level so both the PH and whitebox sides run on the identical
+  small tile.
 
 ## The contribution stack
 
