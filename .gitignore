@@ -1,6 +1,31 @@
-/.claude
-/.conda
-/.vscode
-/FIXES_APPLIED.md
+# Pixi / conda
+.pixi/
+.conda/
+
+# Editor / IDE
+.claude/
+.vscode/
+.idea/
+
+# Python build artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Pipeline outputs
+/outputs/
+
+# Bulk data that should not be committed
 /data/earthscape/
-/outputs
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Misc
+/FIXES_APPLIED.md
