@@ -209,3 +209,51 @@ def whitebox_strahler(
         strahler,
     )
     return _read_single_band(strahler)
+
+
+def whitebox_stream_vector(
+    dem_path: str | Path,
+    *,
+    threshold: float,
+    condition: str = "breach",
+    workdir: str | Path | None = None,
+) -> Path:
+    """Whitebox stream network as a vector (the field-standard extraction).
+
+    Conditions the DEM, extracts the stream raster at `threshold`, and
+    vectorizes it to a shapefile of stream segments. The ceiling
+    calibration summarizes THIS vector with the same graph-builder used
+    for NHD flowlines, so the whitebox and NHD sides count network
+    elements identically (per-segment), making the ceiling comparison
+    methodologically consistent with the PH-vs-NHD comparison.
+
+    Returns the path to the stream vector shapefile.
+    """
+    import whitebox
+
+    dem_path = Path(dem_path).resolve()
+    owns_tmp = workdir is None
+    workdir = Path(tempfile.mkdtemp(prefix="wbt_")) if owns_tmp else Path(workdir)
+    workdir.mkdir(parents=True, exist_ok=True)
+
+    _conditioned, pointer, accum = _condition_and_route(dem_path, condition, workdir)
+
+    wbt = whitebox.WhiteboxTools()
+    wbt.set_working_dir(str(workdir))
+    wbt.verbose = False
+
+    streams = workdir / "streams.tif"
+    streams_vec = workdir / "streams.shp"
+    _checked(
+        wbt, "extract_streams",
+        lambda: wbt.extract_streams(str(accum), str(streams), threshold=threshold),
+        streams,
+    )
+    _checked(
+        wbt, "raster_streams_to_vector",
+        lambda: wbt.raster_streams_to_vector(
+            str(streams), str(pointer), str(streams_vec)
+        ),
+        streams_vec,
+    )
+    return streams_vec

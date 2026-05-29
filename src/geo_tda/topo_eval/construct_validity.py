@@ -64,24 +64,37 @@ def _strahler_on_digraph(
     return order
 
 
-def stats_from_nhd_flowlines(
-    geojson_path, *, snap_tolerance: float = 1e-4, area_km2: float | None = None
+def stats_from_flowlines(
+    path, *, snap_tolerance: float = 1e-4, area_km2: float | None = None
 ) -> BranchingStats:
-    """Build a network from NHD flowlines and summarize its branching.
+    """Build a network from flow-oriented line segments and summarize it.
+
+    Source-agnostic: takes any flowline vector (NHD flowline GeoJSON, or
+    whitebox raster_streams_to_vector output) and builds the same snapped
+    directed graph, so the NHD reference side and the whitebox ceiling side
+    are counted identically (per-segment Strahler on a graph, never raster
+    cells). This consistency is what makes the ceiling comparison
+    (whitebox-vs-NHD) commensurate with the construct comparison
+    (PH-vs-NHD).
 
     Args:
-        geojson_path: path to an NHD flowline GeoJSON (EPSG:4326).
+        path: a flowline vector readable by geopandas (GeoJSON, shapefile).
         snap_tolerance: degrees within which endpoints are treated as the
             same node (1e-4 deg ~ 11 m at the equator).
         area_km2: tile area for drainage density; if None, density is NaN.
 
     Returns:
-        BranchingStats for the NHD network. Direction is inferred from
-        flowline vertex order (NHD digitizes upstream-to-downstream), so
-        each flowline's last vertex is its downstream end.
+        BranchingStats. Direction is inferred from vertex order: the last
+        vertex of each segment is its downstream end. This holds for NHD
+        (digitized upstream-to-downstream) and for whitebox stream vectors
+        (oriented along the D8 pointer). If a source violates this, roots
+        and hence Strahler order would be mis-assigned; both sources here
+        satisfy it.
     """
     import geopandas as gpd
     from shapely.geometry import LineString, MultiLineString
+
+    geojson_path = path
 
     gdf = gpd.read_file(geojson_path)
 

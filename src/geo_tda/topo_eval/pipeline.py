@@ -15,8 +15,8 @@ import numpy as np
 
 from geo_tda.topo_eval.construct_validity import (
     BranchingStats,
+    stats_from_flowlines,
     stats_from_merge_tree,
-    stats_from_nhd_flowlines,
 )
 
 logger = logging.getLogger(__name__)
@@ -259,7 +259,7 @@ def process_tile(
             )
 
         if nhd_geojson is not None:
-            result.nhd = stats_from_nhd_flowlines(nhd_geojson, area_km2=area)
+            result.nhd = stats_from_flowlines(nhd_geojson, area_km2=area)
 
         return result
     except Exception as exc:  # noqa: BLE001 - per-tile isolation; report, don't crash the batch
@@ -315,26 +315,20 @@ def _cell_km(bbox, shape) -> float:
 
 
 def _whitebox_branching_stats(dem_path, tau_channel, area, workdir) -> BranchingStats:
-    """Whitebox's own Strahler raster summarized into BranchingStats.
+    """Whitebox's field-standard network summarized into BranchingStats.
 
-    The field-standard extraction for the ceiling calibration. Reads the
-    Strahler raster and counts order occurrences; junctions are estimated
-    as the count of order increases (a proxy consistent across tiles).
+    Vectorizes whitebox's stream raster and runs it through the SAME
+    graph-builder used for NHD flowlines (stats_from_flowlines), so the
+    whitebox and NHD sides count network elements identically (per-segment
+    Strahler on a snapped graph). This is what makes the ceiling
+    (whitebox-vs-NHD) and the construct comparison (PH-vs-NHD)
+    methodologically consistent: both reference sides and the metric side
+    count network nodes, never raster cells.
     """
-    from geo_tda.topo_eval.construct_validity import _bifurcation_ratio
-    from geo_tda.topo_eval.hydrology import whitebox_strahler
+    from geo_tda.topo_eval.construct_validity import stats_from_flowlines
+    from geo_tda.topo_eval.hydrology import whitebox_stream_vector
 
-    strahler = whitebox_strahler(dem_path, threshold=tau_channel, workdir=workdir)
-    on_stream = strahler[strahler >= 1]
-    dist: dict[int, int] = {}
-    for order in np.unique(on_stream):
-        dist[int(order)] = int((on_stream == order).sum())
-    rb = _bifurcation_ratio(dist)
-    return BranchingStats(
-        junction_count=sum(
-            dist.get(o, 0) for o in dist if o >= 2
-        ),
-        strahler_distribution=dist,
-        bifurcation_ratio=rb,
-        drainage_density=float("nan"),
+    stream_vec = whitebox_stream_vector(
+        dem_path, threshold=tau_channel, workdir=workdir
     )
+    return stats_from_flowlines(stream_vec, area_km2=area)
