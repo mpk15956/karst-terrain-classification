@@ -1,0 +1,276 @@
+---
+title: "Strahler order is a coarsening of the flow-accumulation merge tree"
+subtitle: "Phase A proof skeleton — statements and obligations filled, arguments TO DRAFT"
+author: "Michael Kerr"
+date: "2026-05-26"
+format:
+  html:
+    toc: true
+    html-math-method: katex
+---
+
+> **Skeleton status.** This is a Phase A *skeleton*, not a draft proof.
+> Definitions in §1 are starting points to revise. Theorem and lemma
+> *statements* are the claims converged on over four rounds of plan
+> review. Every *argument* is a `[TO DRAFT — MK]` obligation stub:
+> the act of writing the proof is the verification step (three of the
+> four bugs caught in planning were prose-survivable errors that died
+> only when the construction was traced concretely), so the arguments
+> are deliberately left for hand-derivation. The falsification witness
+> in §4 is given as the corrected equal-birth construction so it is
+> not re-derived from the stale round-3 "permute children" version.
+>
+> Claude's role on the filled draft: notation/LaTeX normalization, a
+> referee pass ("find the weakest claim and show where the proof
+> depends on it"), and a targeted check that §4's argument matches the
+> equal-birth construction below.
+
+# 1. Setup
+
+Definitions are starting points; revise notation to taste.
+
+**Grid and elevation.** Let $G$ be a finite set of grid cells with the
+usual 8-neighbour spatial adjacency. Let $z : G \to \mathbb{R}$ be the
+raw DEM elevation.
+
+**Hydrologic conditioning.** Let $z' : G \to \mathbb{R}$ be the
+elevation after whitebox's breach-and-fill conditioning. Every
+construction below operates on $z'$, not $z$; this is stated here in
+the setup, not deferred to a footnote, because the filtration is an
+object of the *modified* field.
+
+**D8 routing.** Let $r : G \to G \cup \{\bot\}$ be the D8
+single-receiver function: $r(c)$ is the steepest-descent 8-neighbour
+of $c$ under $z'$, with $r(c) = \bot$ at outlets and grid edges. D8 is
+a *scope condition*, not an incidental choice (see §6).
+
+**Donor relation.** $\operatorname{don}(c) = \{\, x \in G : r(x) = c \,\}$.
+Because $r$ is a function, the directed graph $\{x \to r(x)\}$ is a
+forest of in-trees rooted at outlets; this fact is load-bearing for
+§5's stability scope and §6's multi-outlet case.
+
+**Flow accumulation.** $A(c) = \bigl|\{\, x \in G : x \leadsto c \,\}\bigr|$,
+where $\leadsto$ is the reflexive-transitive closure of $r$.
+Equivalently $A(c) = 1 + \sum_{x \in \operatorname{don}(c)} A(x)$.
+Accumulation increases strictly downstream: $r(c) \neq \bot \implies
+A(r(c)) > A(c)$.
+
+**Channel mask.** Fix a channelization threshold
+$\tau_{\mathrm{chan}}$. The channel mask is
+$M = \{\, c \in G : A(c) \ge \tau_{\mathrm{chan}} \,\}$.
+$\tau_{\mathrm{chan}}$ is a modeling parameter, not a free variable of
+any theorem below (see §6).
+
+**Donor graph on the mask.** Let $\mathcal{G} = (M, E)$ be the
+*undirected* graph whose edges are $\{c, r(c)\}$ for $c \in M$ with
+$r(c) \in M$. This is the donor-graph adjacency. It is **not** the
+spatial 8-adjacency restricted to $M$; the two coincide on toys
+without subparallel tributaries or meander necks but diverge on real
+terrain (Phase 0 spike,
+[`../notes/orientation_spike.md`](../notes/orientation_spike.md)).
+
+**Merge tree under donor adjacency.** The merge tree $T$ of
+$(M, A, \mathcal{G})$ tracks connected components of the sublevel sets
+$M_{\le t} = \{\, c \in M : A(c) \le t \,\}$ as $t$ increases, where
+connectivity uses $\mathcal{G}$-edges only. A component is *born* at a
+cell with no in-mask donors (a channel head, a local minimum of
+$A|_M$ in $\mathcal{G}$) and components *merge* at a cell with
+$\ge 2$ in-mask donor components (a confluence). The persistence
+diagram $\operatorname{Dgm}_0(A|_M)$ is the multiset of
+$(\text{birth}, \text{death})$ pairs of $T$.
+
+# 2. Lemma (bijection: donor-graph merge tree $\cong$ channel network)
+
+**Lemma.** The merge tree $T$ of $(M, A, \mathcal{G})$, as a rooted
+tree with each edge labeled by its $A$-interval, is isomorphic to the
+channel network extracted by the standard hydrology workflow
+(threshold $A$ at $\tau_{\mathrm{chan}}$; extract maximal channel
+segments between junctions; root at the outlet). Under the
+isomorphism: leaves $\leftrightarrow$ channel heads, internal nodes
+$\leftrightarrow$ confluences, root $\leftrightarrow$ outlet.
+
+*Remark (positioning, per [`../notes/folklore_check.md`](../notes/folklore_check.md)).*
+This lemma formalizes a folklore correspondence approached from three
+sides by prior work (TerraStream's elevation-persistence + Pfafstetter
+pipeline; Cousty et al. watershed-as-MSF; Horton-Strahler tree-pruning
+combinatorics) without uniting them on the flow-accumulation scalar.
+State it as a clarifying lemma, not a headline result; the novelty is
+the *donor-graph adjacency* (no prior terrain merge tree is built on
+the flow graph rather than spatial adjacency) and the downstream
+contributions in §3-§4 and the contrast in §7.
+
+*Proof obligation.* `[TO DRAFT — MK]` Show the bijection by tracing the
+ascending-$A$ sweep cell-by-cell: (i) a cell with no in-mask donor is
+exactly a channel head; (ii) a cell with one in-mask donor component
+extends a channel segment; (iii) a cell with $\ge 2$ in-mask donor
+components is exactly a junction; (iv) the strictly-increasing
+property of $A$ downstream guarantees each cell is processed after all
+its donors, so the sweep is well-defined. Walk the branching-channel
+toy concretely (as the Y-toy was walked) to confirm the
+correspondence before generalizing.
+
+# 3. Theorem 1 (Strahler order is a coarsening of $T$)
+
+**Definition (Strahler map on a rooted tree).** $S : T \to
+\mathbb{Z}_{>0}$, bottom-up: $S(\text{leaf}) = 1$; for an internal
+node with children of orders $o_1 \ge o_2 \ge \dots$, set
+$S = o_1 + 1$ if $o_1 = o_2$, else $S = o_1$.
+
+**Theorem 1.** The Horton-Strahler stream order of the channel network
+(via the Lemma's isomorphism) equals $S$ applied to $T$. Consequently,
+the standard hydrology summaries — Horton bifurcation ratio $R_b$,
+length ratio $R_l$, and the Hack exponent computed from channel
+lengths — factor through $T$: each is a function of $T$ alone, hence a
+coarsening of the merge tree.
+
+*Proof obligation.* `[TO DRAFT — MK]` (a) The Strahler equality is
+immediate from the Lemma plus the definition of $S$, but state the
+correspondence of confluence-types (equal-order vs unequal-order
+junctions) explicitly. (b) For the "factor through $T$" claim, exhibit
+each summary as a function of the tree's combinatorial type and edge
+labels; this is what makes "coarsening" precise and is the sentence a
+hydrologist referee will check.
+
+# 4. Theorem 2 (the persistence diagram is a lossy coarsening of $T$)
+
+**Theorem 2.** $\operatorname{Dgm}_0(A|_M)$ is the abelianization of
+$T$: it records the multiset of $(\text{birth}, \text{death})$
+intervals but discards the branching pairing (which child merges into
+which parent). There exist DEMs $M_1, M_2$ with
+$d_B\bigl(\operatorname{Dgm}_0(A|_{M_1}),
+\operatorname{Dgm}_0(A|_{M_2})\bigr) = 0$ but distinct Strahler
+distributions. Hence Strahler order (Theorem 1) cannot factor through
+$\operatorname{Dgm}_0$; the merge tree is the right invariant.
+
+**Falsification witness — equal-birth construction (given).** Use four
+channel heads, all entering at $A = \tau_{\mathrm{chan}}$, so births
+are degenerate at a common value $\tau$. Then the barcode is
+determined by the death (confluence) heights alone, independent of the
+branching:
+
+- *Tree A (balanced).* Two head-pairs merge at confluence heights
+  $h_1, h_2$; the two resulting order-2 streams merge at $h_3$.
+  Confluence orders $\{2, 2, 3\}$, root order $3$.
+- *Tree B (caterpillar).* Heads join a single main stem successively
+  at $h_1, h_2, h_3$; each junction is order-2-meets-order-1, so the
+  output stays order $2$. Confluence orders $\{2, 2, 2\}$, root order
+  $2$.
+
+Both trees: four births at $\tau$, three deaths at the *same*
+multiset $\{h_1, h_2, h_3\}$ (arrange branch cell-counts so the
+confluence accumulations coincide), one infinite class. Barcode
+$\{(\tau, h_1), (\tau, h_2), (\tau, h_3), (\tau, \infty)\}$ is
+identical; Strahler distributions $\{2, 2, 3\}$ vs $\{2, 2, 2\}$
+differ.
+
+> **Why equal-birth, not "permute children."** With *distinct* birth
+> heights the elder rule pairs each death with the younger merging
+> component's birth, so permuting children changes the pairing and
+> thus the barcode — bottleneck distance comes back nonzero and the
+> witness fails. Equalizing births collapses the barcode to a
+> death-multiset, which is the regime where the construction delivers
+> identical barcodes by design. The Phase B test must *measure*
+> $d_B \approx 0$ empirically, never assume the construction produced
+> it.
+
+*Proof obligation.* `[TO DRAFT — MK]` (a) Prove the abelianization
+claim: $\operatorname{Dgm}_0$ retains birth/death heights and the
+elder-rule pairing but forgets sibling order at each merge. (b) Verify
+the two witness DEMs realize the claimed accumulation values so the
+death multisets coincide exactly (this is the arithmetic step where a
+stale mental model would slip in; check branch cell-counts against the
+intended $h_1, h_2, h_3$). (c) Confirm Strahler distributions differ.
+This matches the Phase B `test_falsification.py` fixture.
+
+# 5. Theorem 3 (field-level stability, honestly scoped)
+
+**Theorem 3.** For accumulation fields $A_1, A_2$ on a common mask,
+$$
+d_B\bigl(\operatorname{Dgm}_0(A_1), \operatorname{Dgm}_0(A_2)\bigr)
+\;\le\; \lVert A_1 - A_2 \rVert_\infty .
+$$
+No global Lipschitz bound of the form
+$\lVert A_1 - A_2 \rVert_\infty \le L \, \lVert z'_1 - z'_2 \rVert_\infty$
+exists: D8 routing is discontinuous in elevation at saddles, so an
+$\varepsilon$ perturbation can reroute an $O(\text{catchment size})$
+mass of accumulation. This instability is a property of *drainage*
+(small divide migrations genuinely reroute basins; a faithful drainage
+metric reflects that), not a defect of the metric.
+
+*Proof obligation.* `[TO DRAFT — MK]` (a) Apply the
+Cohen-Steiner–Edelsbrunner–Harer (2007) bottleneck stability theorem
+to $A$ as a function on the donor graph $\mathcal{G}$; confirm the
+hypotheses transfer from the simplicial/cubical setting to this
+graph filtration. (b) Give the saddle-flip counterexample explicitly:
+two DEMs $\varepsilon$-close in $z'$ whose accumulation fields differ
+by an entire catchment, defeating any finite $L$. (c) Optional:
+state and sketch the generic-stability claim (DEMs off a measure-zero
+set of saddle-tied configurations have $A$ stable under sufficiently
+small perturbations).
+
+# 6. Discussion sub-cases
+
+`[TO DRAFT — MK]` each as a short paragraph; these neutralize the
+predictable referee objections.
+
+- **Flat regions.** The filtration operates on the breach-and-fill
+  $z'$, where flats are resolved; the construction needs no separate
+  flat-handling. State the dependence on the conditioning algorithm.
+- **D8 vs D-infinity.** The bijection (Lemma) holds under D8 because
+  single-receiver routing makes $\{x \to r(x)\}$ a forest, so the
+  donor graph is a tree per basin and Strahler is well-defined. Under
+  D-infinity (multiple receivers) the filtration is still defined but
+  the coarsening map to Strahler is not a function. Mark D-infinity
+  as future work.
+- **Multi-outlet tiles.** A tile boundary cuts across divides, so the
+  channel network is a *forest* of trees, one per basin reaching the
+  boundary. The Lemma and Theorems 1-3 apply tree-by-tree; state this
+  so the real-DEM construction in Phase C is covered.
+- **Channel-mask choice.** $\tau_{\mathrm{chan}}$ is a modeling
+  parameter set per-tile in Phase C to match NHD drainage density; no
+  theorem depends on its value. The sweep over $\tau_{\mathrm{chan}}$
+  recovers the full merge tree; a single threshold is one slice.
+
+# 7. What flow-accumulation $H_0$ separates that elevation $H_0$ conflates {#sec-contrast}
+
+> **Load-bearing section.** Per the folklore-collision profile, the
+> elevation merge tree is thoroughly worked in prior art (TerraStream,
+> Agarwal-Arge-Yi, Cousty et al.). A referee in that lineage will read
+> the construction fluently and ask: *what does the flow-accumulation
+> filtration buy over the elevation merge tree everyone already
+> builds?* The novelty cannot rest on the adjacency choice alone
+> (adjacency is a construction, not a result). It must land here. This
+> section carries the paper's defense; budget it as a primary section,
+> not a remark.
+
+*Obligations.* `[TO DRAFT — MK]`
+
+- **Divide-vs-channel asymmetry.** Show, with a worked example, a
+  configuration where elevation-sublevel $H_0$ merges two components
+  at a low saddle that flow accumulation keeps separate (or vice
+  versa), so the elevation merge tree reports a basin relationship
+  that the drainage does not have.
+- **Basin hierarchy independent of absolute relief.** Show that two
+  terrains with very different elevation ranges but the same drainage
+  hierarchy have the same flow-accumulation merge tree while their
+  elevation merge trees differ (or are incomparable). This is the
+  "what flow accumulation buys" sentence in its strongest form.
+- **Planned figure (the adjacency-choice demonstration).** The
+  meander-neck mask, side by side: $H_1 = 8$ under cubical
+  8-adjacency vs $H_1 = 0$ under donor-graph adjacency (Phase 0 spike;
+  the count is hand-verified: 9 cells, 16 8-adjacency edges, one
+  component, $H_1 = 16 - 9 + 1 = 8$). This converts "the adjacency
+  choice is a real contribution" from an assertion into a one-glance
+  demonstration, pre-empting the "adjacency is just an implementation
+  detail" referee.
+
+# Pre-submission checklist (carry forward)
+
+- Deep read of Cousty-Najman, "Characterization of Graph-Based
+  Hierarchical Watersheds," *JMIV* 2019 — the single paper most able
+  to pre-empt the Lemma's framing (flagged in the folklore check;
+  non-optional before submission).
+- Confirm the Phase B `test_falsification.py` fixture realizes the
+  §4 equal-birth construction with coinciding death multisets.
+- Confirm the §7 elevation-contrast worked examples have matching
+  Phase B toy fixtures so the prose claims are computationally backed.
