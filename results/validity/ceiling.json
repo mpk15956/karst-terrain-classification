@@ -1,0 +1,7 @@
+{
+  "n_tiles": 1,
+  "junction_count_spearman_proxy": NaN,
+  "strahler_wasserstein_median": 0.7747703647703648,
+  "bifurcation_ratio_abs_diff_median": 41.72195761211405,
+  "note": "this is the agreement CEILING; PH-vs-NHD is calibrated relative to it (PH >= 95% of this agreement)"
+}
