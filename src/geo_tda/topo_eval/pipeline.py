@@ -40,50 +40,121 @@ class AcquiredTile:
     bbox: tuple[float, float, float, float]
 
 
+# Planetary Computer 3DEP seamless DEM.
+PC_STAC_URL = "https://planetarycomputer.microsoft.com/api/stac/v1"
+PC_3DEP_COLLECTION = "3dep-seamless"
+PC_3DEP_ASSET = "data"
+
+
+def _tile_keys_covering_bbox(
+    bbox: tuple[float, float, float, float],
+) -> list[tuple[int, int, tuple[float, float, float, float]]]:
+    """Integer 1-degree tile SW corners covering bbox.
+
+    Returns (sw_lon, sw_lat, tile_bbox) per 1x1 degree tile, where
+    tile_bbox is (min_lon, min_lat, max_lon, max_lat).
+    """
+    import math
+
+    min_lon, min_lat, max_lon, max_lat = bbox
+    out = []
+    for lat in range(math.floor(min_lat), math.ceil(max_lat)):
+        for lon in range(math.floor(min_lon), math.ceil(max_lon)):
+            out.append((lon, lat, (float(lon), float(lat), float(lon + 1), float(lat + 1))))
+    return out
+
+
 def acquire_tiles(
     bbox: tuple[float, float, float, float],
     *,
     n_tiles: int,
     dem_dir: str | Path = "data/dem",
     nhd_dir: str | Path = "data/nhd",
-    resolution: int = 30,
+    gsd: int = 30,
     fetch_nhd: bool = True,
 ) -> list[AcquiredTile]:
-    """Discover/download up to n_tiles DEMs in bbox and their NHD flowlines.
+    """Download up to n_tiles 3DEP DEMs covering bbox and their NHD flowlines.
 
-    Network-dependent. DEMs from Planetary Computer 3DEP; NHD flowline
-    vectors from the USGS hydrography service. Per-tile failures are
-    skipped with a warning rather than aborting the batch.
+    Network-dependent. DEMs from Planetary Computer 3DEP seamless (asset
+    hrefs signed via planetary_computer); NHD flowline vectors from the
+    USGS hydrography service. Per-tile failures are skipped with a warning
+    rather than aborting the batch.
     """
-    from geo_tda.data_acquisition.dem import discover_dem_tiles, download_dem_tile
+    import planetary_computer
+    from pystac_client import Client
 
     dem_dir = Path(dem_dir)
     nhd_dir = Path(nhd_dir)
-    discovered = discover_dem_tiles(bbox, resolution=resolution)
-    if not discovered:
-        logger.warning("no DEM tiles discovered for bbox %s", bbox)
-        return []
+    dem_dir.mkdir(parents=True, exist_ok=True)
+
+    catalog = Client.open(PC_STAC_URL, modifier=planetary_computer.sign_inplace)
+    tile_specs = _tile_keys_covering_bbox(bbox)
 
     out: list[AcquiredTile] = []
-    for tile in discovered[:n_tiles]:
+    for sw_lon, sw_lat, tbbox in tile_specs:
+        if len(out) >= n_tiles:
+            break
+        key = _key_from_corner(sw_lon, sw_lat)
         try:
-            dem_path = download_dem_tile(tile, dem_dir)
-            tbbox = _tile_bbox_from_raster(dem_path)
+            dem_path = dem_dir / f"USGS_seamless_{key}_{gsd}m.tif"
+            if not dem_path.exists():
+                href = _find_3dep_href(catalog, tbbox, gsd)
+                if href is None:
+                    logger.warning("no 3DEP item for %s at gsd=%d", key, gsd)
+                    continue
+                _download(href, dem_path)
             nhd_path = None
             if fetch_nhd:
                 from geo_tda.data_acquisition.nhd import fetch_nhd_flowlines
 
-                nhd_path = nhd_dir / f"{tile.key}.geojson"
+                nhd_path = nhd_dir / f"{key}.geojson"
                 if not nhd_path.exists():
                     fetch_nhd_flowlines(tbbox, nhd_path)
             out.append(
-                AcquiredTile(
-                    key=tile.key, dem_path=dem_path, nhd_path=nhd_path, bbox=tbbox
-                )
+                AcquiredTile(key=key, dem_path=dem_path, nhd_path=nhd_path, bbox=tbbox)
             )
         except Exception as exc:  # noqa: BLE001 - per-tile isolation
-            logger.warning("acquisition failed for %s: %s", tile.key, exc)
+            logger.warning("acquisition failed for %s: %s", key, exc)
     return out
+
+
+def _key_from_corner(lon: int, lat: int) -> str:
+    ns = "n" if lat >= 0 else "s"
+    ew = "w" if lon < 0 else "e"
+    return f"{ns}{abs(lat):02d}{ew}{abs(lon):03d}"
+
+
+def _find_3dep_href(catalog, tbbox, gsd) -> str | None:
+    search = catalog.search(
+        collections=[PC_3DEP_COLLECTION],
+        bbox=tbbox,
+        query={"gsd": {"eq": gsd}},
+    )
+    items = list(search.item_collection())
+    if not items:
+        # retry without the gsd filter; pick the finest available
+        items = list(
+            catalog.search(collections=[PC_3DEP_COLLECTION], bbox=tbbox).item_collection()
+        )
+        if not items:
+            return None
+        items.sort(key=lambda it: it.properties.get("gsd", 1e9))
+    item = items[0]
+    asset = item.assets.get(PC_3DEP_ASSET)
+    return asset.href if asset else None
+
+
+def _download(href: str, dest: Path) -> None:
+    import requests
+
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    tmp = dest.with_suffix(dest.suffix + ".tmp")
+    with requests.get(href, stream=True, timeout=600) as r:
+        r.raise_for_status()
+        with open(tmp, "wb") as f:
+            for chunk in r.iter_content(chunk_size=1 << 20):
+                f.write(chunk)
+    tmp.rename(dest)
 
 
 def _tile_bbox_from_raster(dem_path: Path) -> tuple[float, float, float, float]:
@@ -116,6 +187,7 @@ def process_tile(
     include_whitebox: bool = False,
     include_ph: bool = True,
     workdir: str | Path | None = None,
+    window: int | None = None,
 ) -> TileResult:
     """Run the requested sides of the comparison for one tile.
 
@@ -129,6 +201,14 @@ def process_tile(
             field-standard, for the ceiling calibration).
         include_ph: run the PH donor-graph merge tree (the metric).
         workdir: whitebox intermediates dir.
+        window: if set, process a centered window x window crop of the
+            flow grids instead of the full tile. The pure-Python donor
+            union-find does not scale to full 1-degree tiles (~13M cells)
+            on a laptop; windowing is the smoke/partial path, with the
+            full-tile run deferred to Sapelo2. Windowing introduces an
+            edge effect (cells whose donors lie outside the window read as
+            channel heads), which biases junction/Strahler counts near the
+            window border; acceptable for the demo, documented here.
 
     Returns:
         TileResult with whichever sides were requested; on failure, the
@@ -148,6 +228,10 @@ def process_tile(
             receiver_codes, accumulation = d8_pointer_and_accumulation(
                 dem_path, workdir=workdir
             )
+            if window is not None:
+                receiver_codes, accumulation = _center_window(
+                    receiver_codes, accumulation, window
+                )
             mask = accumulation >= tau_channel
             channel_cells = int(mask.sum())
             cell_km = _cell_km(bbox, accumulation.shape)
@@ -174,6 +258,16 @@ def process_tile(
     except Exception as exc:  # noqa: BLE001 - per-tile isolation; report, don't crash the batch
         logger.warning("tile %s failed: %s", key, exc)
         return TileResult(key=key, bbox=(0, 0, 0, 0), error=str(exc))
+
+
+def _center_window(receiver_codes, accumulation, window):
+    H, W = accumulation.shape
+    if window >= H and window >= W:
+        return receiver_codes, accumulation
+    i0 = max(0, (H - window) // 2)
+    j0 = max(0, (W - window) // 2)
+    sl = (slice(i0, i0 + window), slice(j0, j0 + window))
+    return receiver_codes[sl].copy(), accumulation[sl].copy()
 
 
 def _cell_km(bbox, shape) -> float:

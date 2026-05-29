@@ -35,6 +35,13 @@ def main() -> int:
     ap.add_argument("--tau-channel", type=float, default=1000.0)
     ap.add_argument("--quick", action="store_true", help="smoke run, 2 tiles")
     ap.add_argument(
+        "--window", type=int, default=None,
+        help="process a centered window x window crop (laptop/partial tier; "
+        "the pure-Python donor union-find does not scale to a full ~13M-cell "
+        "1-degree tile, so windowing is the smoke/partial path with the "
+        "full-tile run deferred to Sapelo2). --quick implies --window 512.",
+    )
+    ap.add_argument(
         "--ceiling", type=Path, default=Path("results/validity/ceiling.json"),
         help="ceiling JSON from validity_real_ceiling.py for relative thresholds",
     )
@@ -42,6 +49,7 @@ def main() -> int:
     args = ap.parse_args()
 
     n_tiles = 2 if args.quick else args.n_tiles
+    window = args.window if args.window is not None else (512 if args.quick else None)
     tiles = acquire_tiles(tuple(args.bbox), n_tiles=n_tiles)
     if not tiles:
         print("no tiles acquired (network or coverage issue); see logs")
@@ -55,6 +63,7 @@ def main() -> int:
         res = process_tile(
             t.dem_path, key=t.key, tau_channel=args.tau_channel,
             nhd_geojson=t.nhd_path, include_ph=True, include_whitebox=False,
+            window=window,
         )
         if res.error or res.ph is None or res.nhd is None:
             print(f"skip {t.key}: {res.error}")

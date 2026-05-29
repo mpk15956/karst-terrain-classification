@@ -19,9 +19,11 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-# USGS National Map hydrography service. Layer 6 of the NHD MapServer is
-# the flowline feature layer (NHDFlowline). The service returns GeoJSON
-# when queried with f=geojson.
+# USGS National Map hydrography service. Layer 6 of the (lowercase) nhd
+# MapServer is "Flowline - Large Scale" (the high-resolution NHDFlowline),
+# verified against the live service: it returns LineString GeoJSON. The
+# uppercase NHD/MapServer path and layer 5 ("Flowline - Small Scale,
+# HI/PR/VI/Pacific") do not serve the continental US here.
 NHD_FLOWLINE_URL = (
     "https://hydro.nationalmap.gov/arcgis/rest/services/nhd/MapServer/6/query"
 )
