@@ -140,11 +140,23 @@ $o$ by Fact A). Sweep $t$ upward.
   absent (receiver $A$ is larger). It joins the one present
   component without merging. Such cells are the interiors of edges.
 - **Branch cells are merges.** A branch cell $v$ ($k \ge 2$ in-mask
-  donors) has, at $t = A(v)$, all $k$ donors present and its receiver
-  absent. In a tree the only path between any two donors of $v$ runs
-  through $v$, which is not yet present, so the $k$ donors lie in $k$
-  *distinct* components. Adding $v$ merges exactly those $k$. So $v$
-  is an internal merge node of arity $k$.
+  donors) has, at $t = A(v)$, all $k$ donors present (donor $A$ is
+  smaller, Fact A) and its receiver absent. The $k$ donors lie in $k$
+  *distinct* components at time $A(v)$. To see this, note the donors
+  sit in $k$ different subtrees of $v$ in the forest $\mathcal{G}$
+  (each donor roots one subtree hanging off $v$). A present cell
+  $x$ (with $A(x) < A(v)$) routes downstream within its own subtree:
+  by Fact C the mask is downstream-closed, so the downstream path of
+  $x$ stays in the mask, and it cannot leave $x$'s subtree without
+  passing through their lowest common ancestor, which is $v$ itself.
+  Since $v$ is absent at time $A(v)$, no present path connects two
+  donor subtrees. Hence the $k$ donor components are pairwise
+  disjoint, and adding $v$ merges exactly those $k$. So $v$ is an
+  internal merge node of arity $k$. (The earlier "unique tree path
+  through $v$" is necessary but not sufficient on its own: it
+  controls paths in $\mathcal{G}$, while components are connectivity
+  among *present* cells; Fact C is what transfers the former to the
+  latter.)
 - **Termination.** At $t = A(o)$ the last cell joins and a single
   component remains: the whole basin, rooted at $o$.
 
@@ -189,6 +201,26 @@ For $k = 2$ this is the classical confluence rule (two equal orders
 $i$ give $i+1$; unequal give the larger). The rule depends only on
 the *multiset* of children's orders, so it is well defined on
 non-binary confluences (D8 cells may have up to seven donors).
+
+**Arity convention.** The Strahler order at a $k$-way confluence
+($k \ge 3$) under the multiset rule above is in general *not* equal
+to the order obtained by resolving the same junction into a cascade
+of binary confluences, and a binary cascade can itself be
+order-dependent. Example: three incoming orders $\{2, 2, 1\}$. The
+multiset rule gives $m = 2$, $n = 2$, so $S = 3$. A binary
+resolution $(2, 1) \to 2$ then $(2, 2) \to 3$ also gives $3$, but
+the intermediate stream counts $N_i$ differ from the single-node
+accounting. We therefore fix the convention that the channel network
+is read with the *same node arity as $T$*: a cell with $k$ in-mask
+donors is one confluence of arity $k$, never a synthesized binary
+cascade. The merge-tree arity is fixed by D8 geometry (a cell's
+in-mask donor count), so this convention is canonical for $T$;
+Theorem 1's equality of orderings and of $N_i$ holds under it.
+Channel-extraction pipelines that split multi-way junctions into
+binary cascades will report the same Strahler *order* at the root in
+the common cases but may report different intermediate $N_i$, hence a
+different $R_b$; comparisons in Phase C use the $T$-arity convention
+on both the PH side and the reference side.
 
 **Theorem 1.** Under the Lemma's isomorphism, the Horton-Strahler
 stream order of the channel network equals $S$ applied to $T$.
