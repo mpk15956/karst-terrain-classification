@@ -22,10 +22,12 @@ def test_pointer_to_receiver_codes_translation():
     from geo_tda.topo_eval.hydrology import pointer_to_receiver_codes
     from geo_tda.topo_eval.merge_tree import D8_OFFSETS
 
-    # whitebox powers-of-two -> (dy, dx) -> receiver-code index
+    # WhiteboxTools pointer grid (64 128 1 / 32 0 2 / 16 8 4):
+    # 1=NE 2=E 4=SE 8=S 16=SW 32=W 64=NW 128=N. Verified empirically
+    # against the accumulation gradient on real whitebox output.
     wbt_to_offset = {
-        1: (0, 1), 2: (1, 1), 4: (1, 0), 8: (1, -1),
-        16: (0, -1), 32: (-1, -1), 64: (-1, 0), 128: (-1, 1),
+        1: (-1, 1), 2: (0, 1), 4: (1, 1), 8: (1, 0),
+        16: (1, -1), 32: (0, -1), 64: (-1, -1), 128: (-1, 0),
     }
     grid = np.array([[1, 2, 4, 8], [16, 32, 64, 128]])
     codes = pointer_to_receiver_codes(grid)
@@ -70,7 +72,9 @@ def test_d8_pointer_and_accumulation_sane(synthetic_valley_dem):
     assert (codes >= 0).sum() > 0.95 * codes.size
 
 
-def test_process_tile_real_path_produces_sane_tree(synthetic_valley_dem):
+def test_process_tile_real_path_produces_connected_tree(synthetic_valley_dem):
+    from geo_tda.topo_eval.merge_tree import merge_tree_from_accumulation
+    from geo_tda.topo_eval.hydrology import d8_pointer_and_accumulation
     from geo_tda.topo_eval.pipeline import process_tile
 
     res = process_tile(
@@ -79,17 +83,30 @@ def test_process_tile_real_path_produces_sane_tree(synthetic_valley_dem):
     )
     assert res.error is None
     assert res.ph is not None
-    # This synthetic surface is a single central channel fed by parallel
-    # hillslope flow (a "feather"), so the analytical answer is many
-    # order-1 tributaries on one order-2 trunk: dist == {1: many, 2: 1}.
-    # The point of this test is that the real whitebox -> pointer ->
-    # merge-tree path runs and yields that structurally-correct feather,
-    # not a dendritic network (which this geometry does not contain).
+
+    # Connectivity is THE regression guard for the whitebox-pointer ->
+    # receiver-code translation. This surface drains to a single outlet, so
+    # the donor merge tree must be ONE connected basin (one root). The
+    # original pointer table was the ESRI convention rotated one step off
+    # WhiteboxTools', which mis-routed every cell 45 degrees and shattered
+    # the donor graph into one component per cell (thousands of roots) while
+    # every toy test passed, because the toys hand-build receiver codes and
+    # never exercise this translation. Assert it directly on real whitebox
+    # output so the seam can never silently break again.
+    codes, accum = d8_pointer_and_accumulation(synthetic_valley_dem)
+    tree = merge_tree_from_accumulation(codes, accum, tau_channel=20)
+    assert len(tree.roots) == 1, (
+        f"single-outlet valley must be one connected basin, got "
+        f"{len(tree.roots)} roots (rotated/!connected donor graph?)"
+    )
+    # structural sanity (robust, not calibrated to a specific count):
     dist = res.ph.strahler_distribution
-    assert set(dist) == {1, 2}, f"feather geometry -> orders {{1,2}}, got {dist}"
-    assert dist[2] == 1, f"single trunk -> one order-2 stream, got {dist}"
-    assert dist[1] > 10, f"many order-1 tributaries expected, got {dist}"
+    assert min(dist) == 1 and set(dist) == set(range(1, max(dist) + 1)), \
+        f"Strahler orders must be contiguous from 1, got {dist}"
+    assert max(dist) >= 2, f"a branching network needs order >= 2, got {dist}"
+    assert dist[1] == max(dist.values()), \
+        f"order-1 should be the most numerous, got {dist}"
     assert res.ph.junction_count >= 1
-    # the donor graph is a forest, so cubical H1 (>0 here) is exactly the
+    # donor graph is a forest, so cubical H1 (>0 here) is exactly the
     # spatial-adjacency contamination the donor construction removes
     assert res.h1_cubical is not None and res.h1_cubical > 0

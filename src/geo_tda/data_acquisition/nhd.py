@@ -12,6 +12,7 @@ genuinely external criterion. See docs/topo_eval/_evaluation_conventions.md.
 """
 from __future__ import annotations
 
+import json
 import logging
 from pathlib import Path
 
@@ -34,13 +35,23 @@ def fetch_nhd_flowlines(
     dest_path: str | Path,
     *,
     timeout: int = 300,
+    page_size: int = 2000,
 ) -> Path:
-    """Download NHD flowline vectors intersecting a bbox as GeoJSON.
+    """Download ALL NHD flowline vectors intersecting a bbox as GeoJSON.
+
+    The ArcGIS service caps a single response at its maxRecordCount (2000
+    here) and signals truncation with exceededTransferLimit. A 1-degree
+    high-resolution tile has far more than 2000 flowlines, so a single
+    request silently truncates the ground truth (under-counting drainage
+    density and the NHD branching reference). This pages with resultOffset
+    until the service stops reporting more, then writes the combined
+    FeatureCollection.
 
     Args:
         bbox: (min_lon, min_lat, max_lon, max_lat) in WGS84.
         dest_path: where to write the GeoJSON FeatureCollection.
-        timeout: request timeout in seconds.
+        timeout: per-request timeout in seconds.
+        page_size: records per request (the service's maxRecordCount).
 
     Returns:
         The path written. Raises requests.HTTPError on a failed request,
@@ -49,7 +60,7 @@ def fetch_nhd_flowlines(
     dest_path = Path(dest_path)
     dest_path.parent.mkdir(parents=True, exist_ok=True)
     min_lon, min_lat, max_lon, max_lat = bbox
-    params = {
+    base = {
         "geometry": f"{min_lon},{min_lat},{max_lon},{max_lat}",
         "geometryType": "esriGeometryEnvelope",
         "inSR": "4326",
@@ -59,15 +70,33 @@ def fetch_nhd_flowlines(
         "returnGeometry": "true",
         "f": "geojson",
     }
-    resp = requests.get(NHD_FLOWLINE_URL, params=params, timeout=timeout)
-    resp.raise_for_status()
-    payload = resp.json()
-    features = payload.get("features", [])
+
+    features: list = []
+    offset = 0
+    max_pages = 200  # hard guard: 200 * 2000 = 400k features, far above any
+                     # 1-degree tile; prevents an unbounded loop if the
+                     # service ever reports exceededTransferLimit forever.
+    for _ in range(max_pages):
+        params = {**base, "resultOffset": offset, "resultRecordCount": page_size}
+        resp = requests.get(NHD_FLOWLINE_URL, params=params, timeout=timeout)
+        resp.raise_for_status()
+        payload = resp.json()
+        page = payload.get("features", [])
+        features.extend(page)
+        if not page or not payload.get("exceededTransferLimit"):
+            break
+        offset += len(page)
+
     if not features:
         raise ValueError(
             f"NHD service returned no flowline features for bbox {bbox}"
         )
-    dest_path.write_text(resp.text)
+    fc = {
+        "type": "FeatureCollection",
+        "crs": {"type": "name", "properties": {"name": "EPSG:4326"}},
+        "features": features,
+    }
+    dest_path.write_text(json.dumps(fc))
     logger.info("wrote %d NHD flowlines to %s", len(features), dest_path)
     return dest_path
 

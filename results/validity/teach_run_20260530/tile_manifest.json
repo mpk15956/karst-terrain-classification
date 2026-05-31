@@ -1,0 +1,1082 @@
+{
+  "selection": {
+    "created": "20260530",
+    "provinces": [
+      "cumberland_plateau",
+      "coastal_plain",
+      "appalachian_highlands"
+    ],
+    "n_candidates_scored": 30,
+    "n_selected": 20,
+    "density_metric": "NHD total flowline length (km) / tile area (km2)",
+    "corpus_quintile_edges": [
+      1.4881464316622637,
+      1.6428991278390894,
+      1.7648173141986603,
+      1.9456012001569687
+    ],
+    "rationale": "physiographic spread across NHD drainage-density quintiles; footprints forward-feed Milestone 2 (see docs/topo_eval/notes/m2_reference_forward_feed.md)"
+  },
+  "tiles": [
+    {
+      "key": "n36w086",
+      "bbox": [
+        -86.0,
+        36.0,
+        -85.0,
+        37.0
+      ],
+      "footprint": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -86.0,
+              36.0
+            ],
+            [
+              -85.0,
+              36.0
+            ],
+            [
+              -85.0,
+              37.0
+            ],
+            [
+              -86.0,
+              37.0
+            ],
+            [
+              -86.0,
+              36.0
+            ]
+          ]
+        ]
+      },
+      "nhd_flowline_count": 19548,
+      "nhd_total_length_km": 15175.640235501165,
+      "area_km2": 9894.394676692576,
+      "nhd_drainage_density": 1.5337613599798268,
+      "tau_rule": {
+        "method": "match channel density to NHD drainage density",
+        "target_cells": "round(nhd_drainage_density * area_km2 / cell_km)",
+        "tau": "accumulation value with target_cells cells at or above it",
+        "density_source": "NHD flowline vectors (resolution-invariant)",
+        "note": "re-derives at any substrate resolution by swapping cell_km; sensitivity sweep is +/-10% around the matched tau"
+      },
+      "source": {
+        "product": "USGS 3DEP seamless",
+        "gsd_m": 30
+      },
+      "province": "cumberland_plateau",
+      "quintile": 2
+    },
+    {
+      "key": "n35w087",
+      "bbox": [
+        -87.0,
+        35.0,
+        -86.0,
+        36.0
+      ],
+      "footprint": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -87.0,
+              35.0
+            ],
+            [
+              -86.0,
+              35.0
+            ],
+            [
+              -86.0,
+              36.0
+            ],
+            [
+              -87.0,
+              36.0
+            ],
+            [
+              -87.0,
+              35.0
+            ]
+          ]
+        ]
+      },
+      "nhd_flowline_count": 22456,
+      "nhd_total_length_km": 16374.025444493192,
+      "area_km2": 10020.664928893751,
+      "nhd_drainage_density": 1.6340258416664604,
+      "tau_rule": {
+        "method": "match channel density to NHD drainage density",
+        "target_cells": "round(nhd_drainage_density * area_km2 / cell_km)",
+        "tau": "accumulation value with target_cells cells at or above it",
+        "density_source": "NHD flowline vectors (resolution-invariant)",
+        "note": "re-derives at any substrate resolution by swapping cell_km; sensitivity sweep is +/-10% around the matched tau"
+      },
+      "source": {
+        "product": "USGS 3DEP seamless",
+        "gsd_m": 30
+      },
+      "province": "cumberland_plateau",
+      "quintile": 2
+    },
+    {
+      "key": "n34w085",
+      "bbox": [
+        -85.0,
+        34.0,
+        -84.0,
+        35.0
+      ],
+      "footprint": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -85.0,
+              34.0
+            ],
+            [
+              -84.0,
+              34.0
+            ],
+            [
+              -84.0,
+              35.0
+            ],
+            [
+              -85.0,
+              35.0
+            ],
+            [
+              -85.0,
+              34.0
+            ]
+          ]
+        ]
+      },
+      "nhd_flowline_count": 22313,
+      "nhd_total_length_km": 16725.38257100903,
+      "area_km2": 10143.882789485224,
+      "nhd_drainage_density": 1.6488146519541755,
+      "tau_rule": {
+        "method": "match channel density to NHD drainage density",
+        "target_cells": "round(nhd_drainage_density * area_km2 / cell_km)",
+        "tau": "accumulation value with target_cells cells at or above it",
+        "density_source": "NHD flowline vectors (resolution-invariant)",
+        "note": "re-derives at any substrate resolution by swapping cell_km; sensitivity sweep is +/-10% around the matched tau"
+      },
+      "source": {
+        "product": "USGS 3DEP seamless",
+        "gsd_m": 30
+      },
+      "province": "cumberland_plateau",
+      "quintile": 3
+    },
+    {
+      "key": "n34w087",
+      "bbox": [
+        -87.0,
+        34.0,
+        -86.0,
+        35.0
+      ],
+      "footprint": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -87.0,
+              34.0
+            ],
+            [
+              -86.0,
+              34.0
+            ],
+            [
+              -86.0,
+              35.0
+            ],
+            [
+              -87.0,
+              35.0
+            ],
+            [
+              -87.0,
+              34.0
+            ]
+          ]
+        ]
+      },
+      "nhd_flowline_count": 26744,
+      "nhd_total_length_km": 17398.982916352717,
+      "area_km2": 10143.882789485224,
+      "nhd_drainage_density": 1.7152192387699772,
+      "tau_rule": {
+        "method": "match channel density to NHD drainage density",
+        "target_cells": "round(nhd_drainage_density * area_km2 / cell_km)",
+        "tau": "accumulation value with target_cells cells at or above it",
+        "density_source": "NHD flowline vectors (resolution-invariant)",
+        "note": "re-derives at any substrate resolution by swapping cell_km; sensitivity sweep is +/-10% around the matched tau"
+      },
+      "source": {
+        "product": "USGS 3DEP seamless",
+        "gsd_m": 30
+      },
+      "province": "cumberland_plateau",
+      "quintile": 3
+    },
+    {
+      "key": "n34w086",
+      "bbox": [
+        -86.0,
+        34.0,
+        -85.0,
+        35.0
+      ],
+      "footprint": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -86.0,
+              34.0
+            ],
+            [
+              -85.0,
+              34.0
+            ],
+            [
+              -85.0,
+              35.0
+            ],
+            [
+              -86.0,
+              35.0
+            ],
+            [
+              -86.0,
+              34.0
+            ]
+          ]
+        ]
+      },
+      "nhd_flowline_count": 30306,
+      "nhd_total_length_km": 17856.36034512778,
+      "area_km2": 10143.882789485224,
+      "nhd_drainage_density": 1.7603082286831062,
+      "tau_rule": {
+        "method": "match channel density to NHD drainage density",
+        "target_cells": "round(nhd_drainage_density * area_km2 / cell_km)",
+        "tau": "accumulation value with target_cells cells at or above it",
+        "density_source": "NHD flowline vectors (resolution-invariant)",
+        "note": "re-derives at any substrate resolution by swapping cell_km; sensitivity sweep is +/-10% around the matched tau"
+      },
+      "source": {
+        "product": "USGS 3DEP seamless",
+        "gsd_m": 30
+      },
+      "province": "cumberland_plateau",
+      "quintile": 3
+    },
+    {
+      "key": "n35w085",
+      "bbox": [
+        -85.0,
+        35.0,
+        -84.0,
+        36.0
+      ],
+      "footprint": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -85.0,
+              35.0
+            ],
+            [
+              -84.0,
+              35.0
+            ],
+            [
+              -84.0,
+              36.0
+            ],
+            [
+              -85.0,
+              36.0
+            ],
+            [
+              -85.0,
+              35.0
+            ]
+          ]
+        ]
+      },
+      "nhd_flowline_count": 31424,
+      "nhd_total_length_km": 19752.23047861477,
+      "area_km2": 10020.664928893751,
+      "nhd_drainage_density": 1.9711496810616689,
+      "tau_rule": {
+        "method": "match channel density to NHD drainage density",
+        "target_cells": "round(nhd_drainage_density * area_km2 / cell_km)",
+        "tau": "accumulation value with target_cells cells at or above it",
+        "density_source": "NHD flowline vectors (resolution-invariant)",
+        "note": "re-derives at any substrate resolution by swapping cell_km; sensitivity sweep is +/-10% around the matched tau"
+      },
+      "source": {
+        "product": "USGS 3DEP seamless",
+        "gsd_m": 30
+      },
+      "province": "cumberland_plateau",
+      "quintile": 5
+    },
+    {
+      "key": "n35w084",
+      "bbox": [
+        -84.0,
+        35.0,
+        -83.0,
+        36.0
+      ],
+      "footprint": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -84.0,
+              35.0
+            ],
+            [
+              -83.0,
+              35.0
+            ],
+            [
+              -83.0,
+              36.0
+            ],
+            [
+              -84.0,
+              36.0
+            ],
+            [
+              -84.0,
+              35.0
+            ]
+          ]
+        ]
+      },
+      "nhd_flowline_count": 47957,
+      "nhd_total_length_km": 24247.976930627086,
+      "area_km2": 10020.664928893751,
+      "nhd_drainage_density": 2.4197971993565086,
+      "tau_rule": {
+        "method": "match channel density to NHD drainage density",
+        "target_cells": "round(nhd_drainage_density * area_km2 / cell_km)",
+        "tau": "accumulation value with target_cells cells at or above it",
+        "density_source": "NHD flowline vectors (resolution-invariant)",
+        "note": "re-derives at any substrate resolution by swapping cell_km; sensitivity sweep is +/-10% around the matched tau"
+      },
+      "source": {
+        "product": "USGS 3DEP seamless",
+        "gsd_m": 30
+      },
+      "province": "cumberland_plateau",
+      "quintile": 5
+    },
+    {
+      "key": "n30w083",
+      "bbox": [
+        -83.0,
+        30.0,
+        -82.0,
+        31.0
+      ],
+      "footprint": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -83.0,
+              30.0
+            ],
+            [
+              -82.0,
+              30.0
+            ],
+            [
+              -82.0,
+              31.0
+            ],
+            [
+              -83.0,
+              31.0
+            ],
+            [
+              -83.0,
+              30.0
+            ]
+          ]
+        ]
+      },
+      "nhd_flowline_count": 16293,
+      "nhd_total_length_km": 6747.345981323867,
+      "area_km2": 10605.49383357857,
+      "nhd_drainage_density": 0.6362123336454891,
+      "tau_rule": {
+        "method": "match channel density to NHD drainage density",
+        "target_cells": "round(nhd_drainage_density * area_km2 / cell_km)",
+        "tau": "accumulation value with target_cells cells at or above it",
+        "density_source": "NHD flowline vectors (resolution-invariant)",
+        "note": "re-derives at any substrate resolution by swapping cell_km; sensitivity sweep is +/-10% around the matched tau"
+      },
+      "source": {
+        "product": "USGS 3DEP seamless",
+        "gsd_m": 30
+      },
+      "province": "coastal_plain",
+      "quintile": 1
+    },
+    {
+      "key": "n31w085",
+      "bbox": [
+        -85.0,
+        31.0,
+        -84.0,
+        32.0
+      ],
+      "footprint": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -85.0,
+              31.0
+            ],
+            [
+              -84.0,
+              31.0
+            ],
+            [
+              -84.0,
+              32.0
+            ],
+            [
+              -85.0,
+              32.0
+            ],
+            [
+              -85.0,
+              31.0
+            ]
+          ]
+        ]
+      },
+      "nhd_flowline_count": 15448,
+      "nhd_total_length_km": 9973.359245234245,
+      "area_km2": 10494.85140531339,
+      "nhd_drainage_density": 0.9503097147411615,
+      "tau_rule": {
+        "method": "match channel density to NHD drainage density",
+        "target_cells": "round(nhd_drainage_density * area_km2 / cell_km)",
+        "tau": "accumulation value with target_cells cells at or above it",
+        "density_source": "NHD flowline vectors (resolution-invariant)",
+        "note": "re-derives at any substrate resolution by swapping cell_km; sensitivity sweep is +/-10% around the matched tau"
+      },
+      "source": {
+        "product": "USGS 3DEP seamless",
+        "gsd_m": 30
+      },
+      "province": "coastal_plain",
+      "quintile": 1
+    },
+    {
+      "key": "n32w082",
+      "bbox": [
+        -82.0,
+        32.0,
+        -81.0,
+        33.0
+      ],
+      "footprint": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -82.0,
+              32.0
+            ],
+            [
+              -81.0,
+              32.0
+            ],
+            [
+              -81.0,
+              33.0
+            ],
+            [
+              -82.0,
+              33.0
+            ],
+            [
+              -82.0,
+              32.0
+            ]
+          ]
+        ]
+      },
+      "nhd_flowline_count": 28879,
+      "nhd_total_length_km": 13554.49989909473,
+      "area_km2": 10381.012143644244,
+      "nhd_drainage_density": 1.3057011890110781,
+      "tau_rule": {
+        "method": "match channel density to NHD drainage density",
+        "target_cells": "round(nhd_drainage_density * area_km2 / cell_km)",
+        "tau": "accumulation value with target_cells cells at or above it",
+        "density_source": "NHD flowline vectors (resolution-invariant)",
+        "note": "re-derives at any substrate resolution by swapping cell_km; sensitivity sweep is +/-10% around the matched tau"
+      },
+      "source": {
+        "product": "USGS 3DEP seamless",
+        "gsd_m": 30
+      },
+      "province": "coastal_plain",
+      "quintile": 1
+    },
+    {
+      "key": "n32w084",
+      "bbox": [
+        -84.0,
+        32.0,
+        -83.0,
+        33.0
+      ],
+      "footprint": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -84.0,
+              32.0
+            ],
+            [
+              -83.0,
+              32.0
+            ],
+            [
+              -83.0,
+              33.0
+            ],
+            [
+              -84.0,
+              33.0
+            ],
+            [
+              -84.0,
+              32.0
+            ]
+          ]
+        ]
+      },
+      "nhd_flowline_count": 22949,
+      "nhd_total_length_km": 14242.563644087582,
+      "area_km2": 10381.012143644244,
+      "nhd_drainage_density": 1.3719821773648118,
+      "tau_rule": {
+        "method": "match channel density to NHD drainage density",
+        "target_cells": "round(nhd_drainage_density * area_km2 / cell_km)",
+        "tau": "accumulation value with target_cells cells at or above it",
+        "density_source": "NHD flowline vectors (resolution-invariant)",
+        "note": "re-derives at any substrate resolution by swapping cell_km; sensitivity sweep is +/-10% around the matched tau"
+      },
+      "source": {
+        "product": "USGS 3DEP seamless",
+        "gsd_m": 30
+      },
+      "province": "coastal_plain",
+      "quintile": 1
+    },
+    {
+      "key": "n32w083",
+      "bbox": [
+        -83.0,
+        32.0,
+        -82.0,
+        33.0
+      ],
+      "footprint": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -83.0,
+              32.0
+            ],
+            [
+              -82.0,
+              32.0
+            ],
+            [
+              -82.0,
+              33.0
+            ],
+            [
+              -83.0,
+              33.0
+            ],
+            [
+              -83.0,
+              32.0
+            ]
+          ]
+        ]
+      },
+      "nhd_flowline_count": 26046,
+      "nhd_total_length_km": 15803.971370161767,
+      "area_km2": 10381.012143644244,
+      "nhd_drainage_density": 1.5223921474591204,
+      "tau_rule": {
+        "method": "match channel density to NHD drainage density",
+        "target_cells": "round(nhd_drainage_density * area_km2 / cell_km)",
+        "tau": "accumulation value with target_cells cells at or above it",
+        "density_source": "NHD flowline vectors (resolution-invariant)",
+        "note": "re-derives at any substrate resolution by swapping cell_km; sensitivity sweep is +/-10% around the matched tau"
+      },
+      "source": {
+        "product": "USGS 3DEP seamless",
+        "gsd_m": 30
+      },
+      "province": "coastal_plain",
+      "quintile": 2
+    },
+    {
+      "key": "n31w086",
+      "bbox": [
+        -86.0,
+        31.0,
+        -85.0,
+        32.0
+      ],
+      "footprint": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -86.0,
+              31.0
+            ],
+            [
+              -85.0,
+              31.0
+            ],
+            [
+              -85.0,
+              32.0
+            ],
+            [
+              -86.0,
+              32.0
+            ],
+            [
+              -86.0,
+              31.0
+            ]
+          ]
+        ]
+      },
+      "nhd_flowline_count": 31796,
+      "nhd_total_length_km": 17696.85611808923,
+      "area_km2": 10494.85140531339,
+      "nhd_drainage_density": 1.6862417041111768,
+      "tau_rule": {
+        "method": "match channel density to NHD drainage density",
+        "target_cells": "round(nhd_drainage_density * area_km2 / cell_km)",
+        "tau": "accumulation value with target_cells cells at or above it",
+        "density_source": "NHD flowline vectors (resolution-invariant)",
+        "note": "re-derives at any substrate resolution by swapping cell_km; sensitivity sweep is +/-10% around the matched tau"
+      },
+      "source": {
+        "product": "USGS 3DEP seamless",
+        "gsd_m": 30
+      },
+      "province": "coastal_plain",
+      "quintile": 3
+    },
+    {
+      "key": "n37w082",
+      "bbox": [
+        -82.0,
+        37.0,
+        -81.0,
+        38.0
+      ],
+      "footprint": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -82.0,
+              37.0
+            ],
+            [
+              -81.0,
+              37.0
+            ],
+            [
+              -81.0,
+              38.0
+            ],
+            [
+              -82.0,
+              38.0
+            ],
+            [
+              -82.0,
+              37.0
+            ]
+          ]
+        ]
+      },
+      "nhd_flowline_count": 22518,
+      "nhd_total_length_km": 17076.007132534614,
+      "area_km2": 9765.110496023728,
+      "nhd_drainage_density": 1.7486752596898747,
+      "tau_rule": {
+        "method": "match channel density to NHD drainage density",
+        "target_cells": "round(nhd_drainage_density * area_km2 / cell_km)",
+        "tau": "accumulation value with target_cells cells at or above it",
+        "density_source": "NHD flowline vectors (resolution-invariant)",
+        "note": "re-derives at any substrate resolution by swapping cell_km; sensitivity sweep is +/-10% around the matched tau"
+      },
+      "source": {
+        "product": "USGS 3DEP seamless",
+        "gsd_m": 30
+      },
+      "province": "appalachian_highlands",
+      "quintile": 3
+    },
+    {
+      "key": "n35w081",
+      "bbox": [
+        -81.0,
+        35.0,
+        -80.0,
+        36.0
+      ],
+      "footprint": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -81.0,
+              35.0
+            ],
+            [
+              -80.0,
+              35.0
+            ],
+            [
+              -80.0,
+              36.0
+            ],
+            [
+              -81.0,
+              36.0
+            ],
+            [
+              -81.0,
+              35.0
+            ]
+          ]
+        ]
+      },
+      "nhd_flowline_count": 39740,
+      "nhd_total_length_km": 18672.900144879277,
+      "area_km2": 10020.664928893751,
+      "nhd_drainage_density": 1.863439230568176,
+      "tau_rule": {
+        "method": "match channel density to NHD drainage density",
+        "target_cells": "round(nhd_drainage_density * area_km2 / cell_km)",
+        "tau": "accumulation value with target_cells cells at or above it",
+        "density_source": "NHD flowline vectors (resolution-invariant)",
+        "note": "re-derives at any substrate resolution by swapping cell_km; sensitivity sweep is +/-10% around the matched tau"
+      },
+      "source": {
+        "product": "USGS 3DEP seamless",
+        "gsd_m": 30
+      },
+      "province": "appalachian_highlands",
+      "quintile": 4
+    },
+    {
+      "key": "n37w080",
+      "bbox": [
+        -80.0,
+        37.0,
+        -79.0,
+        38.0
+      ],
+      "footprint": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -80.0,
+              37.0
+            ],
+            [
+              -79.0,
+              37.0
+            ],
+            [
+              -79.0,
+              38.0
+            ],
+            [
+              -80.0,
+              38.0
+            ],
+            [
+              -80.0,
+              37.0
+            ]
+          ]
+        ]
+      },
+      "nhd_flowline_count": 26033,
+      "nhd_total_length_km": 18632.652445144115,
+      "area_km2": 9765.110496023728,
+      "nhd_drainage_density": 1.9080841381908762,
+      "tau_rule": {
+        "method": "match channel density to NHD drainage density",
+        "target_cells": "round(nhd_drainage_density * area_km2 / cell_km)",
+        "tau": "accumulation value with target_cells cells at or above it",
+        "density_source": "NHD flowline vectors (resolution-invariant)",
+        "note": "re-derives at any substrate resolution by swapping cell_km; sensitivity sweep is +/-10% around the matched tau"
+      },
+      "source": {
+        "product": "USGS 3DEP seamless",
+        "gsd_m": 30
+      },
+      "province": "appalachian_highlands",
+      "quintile": 4
+    },
+    {
+      "key": "n37w083",
+      "bbox": [
+        -83.0,
+        37.0,
+        -82.0,
+        38.0
+      ],
+      "footprint": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -83.0,
+              37.0
+            ],
+            [
+              -82.0,
+              37.0
+            ],
+            [
+              -82.0,
+              38.0
+            ],
+            [
+              -83.0,
+              38.0
+            ],
+            [
+              -83.0,
+              37.0
+            ]
+          ]
+        ]
+      },
+      "nhd_flowline_count": 31186,
+      "nhd_total_length_km": 18860.002770800576,
+      "area_km2": 9765.110496023728,
+      "nhd_drainage_density": 1.9313660381498206,
+      "tau_rule": {
+        "method": "match channel density to NHD drainage density",
+        "target_cells": "round(nhd_drainage_density * area_km2 / cell_km)",
+        "tau": "accumulation value with target_cells cells at or above it",
+        "density_source": "NHD flowline vectors (resolution-invariant)",
+        "note": "re-derives at any substrate resolution by swapping cell_km; sensitivity sweep is +/-10% around the matched tau"
+      },
+      "source": {
+        "product": "USGS 3DEP seamless",
+        "gsd_m": 30
+      },
+      "province": "appalachian_highlands",
+      "quintile": 4
+    },
+    {
+      "key": "n36w080",
+      "bbox": [
+        -80.0,
+        36.0,
+        -79.0,
+        37.0
+      ],
+      "footprint": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -80.0,
+              36.0
+            ],
+            [
+              -79.0,
+              36.0
+            ],
+            [
+              -79.0,
+              37.0
+            ],
+            [
+              -80.0,
+              37.0
+            ],
+            [
+              -80.0,
+              36.0
+            ]
+          ]
+        ]
+      },
+      "nhd_flowline_count": 40966,
+      "nhd_total_length_km": 19404.930022577002,
+      "area_km2": 9894.394676692576,
+      "nhd_drainage_density": 1.9612043643546606,
+      "tau_rule": {
+        "method": "match channel density to NHD drainage density",
+        "target_cells": "round(nhd_drainage_density * area_km2 / cell_km)",
+        "tau": "accumulation value with target_cells cells at or above it",
+        "density_source": "NHD flowline vectors (resolution-invariant)",
+        "note": "re-derives at any substrate resolution by swapping cell_km; sensitivity sweep is +/-10% around the matched tau"
+      },
+      "source": {
+        "product": "USGS 3DEP seamless",
+        "gsd_m": 30
+      },
+      "province": "appalachian_highlands",
+      "quintile": 5
+    },
+    {
+      "key": "n35w082",
+      "bbox": [
+        -82.0,
+        35.0,
+        -81.0,
+        36.0
+      ],
+      "footprint": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -82.0,
+              35.0
+            ],
+            [
+              -81.0,
+              35.0
+            ],
+            [
+              -81.0,
+              36.0
+            ],
+            [
+              -82.0,
+              36.0
+            ],
+            [
+              -82.0,
+              35.0
+            ]
+          ]
+        ]
+      },
+      "nhd_flowline_count": 51900,
+      "nhd_total_length_km": 21786.18047808954,
+      "area_km2": 10020.664928893751,
+      "nhd_drainage_density": 2.17412523347337,
+      "tau_rule": {
+        "method": "match channel density to NHD drainage density",
+        "target_cells": "round(nhd_drainage_density * area_km2 / cell_km)",
+        "tau": "accumulation value with target_cells cells at or above it",
+        "density_source": "NHD flowline vectors (resolution-invariant)",
+        "note": "re-derives at any substrate resolution by swapping cell_km; sensitivity sweep is +/-10% around the matched tau"
+      },
+      "source": {
+        "product": "USGS 3DEP seamless",
+        "gsd_m": 30
+      },
+      "province": "appalachian_highlands",
+      "quintile": 5
+    },
+    {
+      "key": "n36w083",
+      "bbox": [
+        -83.0,
+        36.0,
+        -82.0,
+        37.0
+      ],
+      "footprint": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -83.0,
+              36.0
+            ],
+            [
+              -82.0,
+              36.0
+            ],
+            [
+              -82.0,
+              37.0
+            ],
+            [
+              -83.0,
+              37.0
+            ],
+            [
+              -83.0,
+              36.0
+            ]
+          ]
+        ]
+      },
+      "nhd_flowline_count": 44243,
+      "nhd_total_length_km": 23337.85479318245,
+      "area_km2": 9894.394676692576,
+      "nhd_drainage_density": 2.3586945493651617,
+      "tau_rule": {
+        "method": "match channel density to NHD drainage density",
+        "target_cells": "round(nhd_drainage_density * area_km2 / cell_km)",
+        "tau": "accumulation value with target_cells cells at or above it",
+        "density_source": "NHD flowline vectors (resolution-invariant)",
+        "note": "re-derives at any substrate resolution by swapping cell_km; sensitivity sweep is +/-10% around the matched tau"
+      },
+      "source": {
+        "product": "USGS 3DEP seamless",
+        "gsd_m": 30
+      },
+      "province": "appalachian_highlands",
+      "quintile": 5
+    }
+  ]
+}

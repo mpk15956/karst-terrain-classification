@@ -59,14 +59,11 @@ class SegmentGraph:
 
     def all_nodes(self) -> list[SegmentNode]:
         out: list[SegmentNode] = []
-
-        def walk(n: SegmentNode) -> None:
+        stack = list(self.roots)
+        while stack:
+            n = stack.pop()
             out.append(n)
-            for c in n.children:
-                walk(c)
-
-        for r in self.roots:
-            walk(r)
+            stack.extend(n.children)
         return out
 
     @property
@@ -97,13 +94,11 @@ class SegmentGraph:
 
 def _descendants(node: SegmentNode) -> list[SegmentNode]:
     out: list[SegmentNode] = []
-
-    def walk(n: SegmentNode) -> None:
-        for c in n.children:
-            out.append(c)
-            walk(c)
-
-    walk(node)
+    stack = list(node.children)
+    while stack:
+        n = stack.pop()
+        out.append(n)
+        stack.extend(n.children)
     return out
 
 
@@ -120,21 +115,27 @@ def segment_graph_from_merge_tree(tree: MergeTree) -> SegmentGraph:
     that count from the union-find sweep; for branching-based criteria
     (junction count, Strahler distribution, R_b) it is not needed.
     """
-    counter = [0]
+    # Iterative build (no recursion: deep trees). Each merge node maps to a
+    # segment node; strahler is read off the merge node (itself computed
+    # iteratively with memoization).
+    counter = 0
+    sg_roots: list[SegmentNode] = []
+    for r in tree.roots:
+        sg_r = SegmentNode(id=counter, cell=r.cell, strahler=r.strahler, parent=None)
+        counter += 1
+        stack: list[tuple[MergeNode, SegmentNode]] = [(r, sg_r)]
+        while stack:
+            mt_node, sg_node = stack.pop()
+            for c in mt_node.children:
+                child = SegmentNode(
+                    id=counter, cell=c.cell, strahler=c.strahler, parent=sg_node
+                )
+                counter += 1
+                sg_node.children.append(child)
+                stack.append((c, child))
+        sg_roots.append(sg_r)
 
-    def build(mt_node: MergeNode, parent: SegmentNode | None) -> SegmentNode:
-        sg = SegmentNode(
-            id=counter[0],
-            cell=mt_node.cell,
-            strahler=mt_node.strahler,
-            parent=parent,
-        )
-        counter[0] += 1
-        for c in mt_node.children:
-            sg.children.append(build(c, sg))
-        return sg
-
-    return SegmentGraph(roots=[build(r, None) for r in tree.roots])
+    return SegmentGraph(roots=sg_roots)
 
 
 def bifurcation_ratio_largest_basin(tree: MergeTree) -> float:

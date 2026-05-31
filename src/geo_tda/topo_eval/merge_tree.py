@@ -46,6 +46,7 @@ class MergeNode:
     birth: float
     death: float | None  # None for the essential (surviving) class
     children: list["MergeNode"] = field(default_factory=list)
+    _strahler: int | None = field(default=None, repr=False, compare=False)
 
     @property
     def is_leaf(self) -> bool:
@@ -59,13 +60,29 @@ class MergeNode:
         attained by n children: m if n == 1, else m + 1. Reduces to the
         classical binary rule (two equal orders i give i+1; unequal give
         the larger). See Theorem 1 of the proof.
+
+        Computed by an iterative post-order with per-node memoization, not
+        recursion: real channel chains are thousands of confluences deep
+        and overflow Python's recursion limit.
         """
-        if self.is_leaf:
-            return 1
-        child_orders = [c.strahler for c in self.children]
-        m = max(child_orders)
-        n = child_orders.count(m)
-        return m if n == 1 else m + 1
+        if self._strahler is not None:
+            return self._strahler
+        stack: list[tuple[MergeNode, bool]] = [(self, False)]
+        while stack:
+            node, ready = stack.pop()
+            if node._strahler is not None:
+                continue
+            if ready or not node.children:
+                if not node.children:
+                    node._strahler = 1
+                else:
+                    co = [c._strahler for c in node.children]
+                    m = max(co)
+                    node._strahler = m if co.count(m) == 1 else m + 1
+            else:
+                stack.append((node, True))
+                stack.extend((c, False) for c in node.children)
+        return self._strahler  # type: ignore[return-value]
 
 
 @dataclass
@@ -78,45 +95,24 @@ class MergeTree:
 
     roots: list[MergeNode]
 
+    def _iter_nodes(self):
+        """Iterative pre-order over the forest (no recursion: deep trees)."""
+        stack = list(self.roots)
+        while stack:
+            node = stack.pop()
+            yield node
+            stack.extend(node.children)
+
     @property
     def leaves(self) -> list[MergeNode]:
-        out: list[MergeNode] = []
-
-        def walk(node: MergeNode) -> None:
-            if node.is_leaf:
-                out.append(node)
-            for c in node.children:
-                walk(c)
-
-        for r in self.roots:
-            walk(r)
-        return out
+        return [n for n in self._iter_nodes() if n.is_leaf]
 
     @property
     def internal_nodes(self) -> list[MergeNode]:
-        out: list[MergeNode] = []
-
-        def walk(node: MergeNode) -> None:
-            if not node.is_leaf:
-                out.append(node)
-            for c in node.children:
-                walk(c)
-
-        for r in self.roots:
-            walk(r)
-        return out
+        return [n for n in self._iter_nodes() if not n.is_leaf]
 
     def all_nodes(self) -> list[MergeNode]:
-        out: list[MergeNode] = []
-
-        def walk(node: MergeNode) -> None:
-            out.append(node)
-            for c in node.children:
-                walk(c)
-
-        for r in self.roots:
-            walk(r)
-        return out
+        return list(self._iter_nodes())
 
     @property
     def num_confluences(self) -> int:
@@ -261,25 +257,24 @@ def persistence_diagram(tree: MergeTree) -> list[tuple[float, float]]:
     pairing, which is why it cannot recover Strahler order.
     """
     pairs: list[tuple[float, float]] = []
-
-    def elder(node: MergeNode) -> float:
-        """Return the birth height of the oldest leaf under node;
-        emit a finite pair for every younger component that dies here.
-        """
-        if node.is_leaf:
-            return node.birth
-        # An internal node's birth is the confluence height: the A-value
-        # at which its donor components merge. Every merging component
-        # except the oldest dies at exactly that height.
-        confluence_height = node.birth
-        child_births = sorted(elder(c) for c in node.children)
-        oldest_birth = child_births[0]
-        for younger_birth in child_births[1:]:
-            pairs.append((younger_birth, confluence_height))
-        return oldest_birth
-
+    # Iterative post-order (deep trees overflow recursion): oldest[node] is
+    # the birth height of the oldest leaf under node.
+    oldest: dict[int, float] = {}
     for root in tree.roots:
-        survivor_birth = elder(root)
-        pairs.append((survivor_birth, float("inf")))
+        stack: list[tuple[MergeNode, bool]] = [(root, False)]
+        while stack:
+            node, ready = stack.pop()
+            if node.is_leaf:
+                oldest[id(node)] = node.birth
+                continue
+            if ready:
+                child_births = sorted(oldest[id(c)] for c in node.children)
+                oldest[id(node)] = child_births[0]
+                for younger_birth in child_births[1:]:
+                    pairs.append((younger_birth, node.birth))
+            else:
+                stack.append((node, True))
+                stack.extend((c, False) for c in node.children)
+        pairs.append((oldest[id(root)], float("inf")))
 
     return pairs

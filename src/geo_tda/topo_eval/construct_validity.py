@@ -45,27 +45,51 @@ def _strahler_on_digraph(
     Uses the generalized multiset rule (Theorem 1): leaf -> 1; internal
     node with child-order maximum m attained by n children -> m if n == 1
     else m + 1.
+
+    Iterative post-order, not recursion: real NHD/whitebox networks have
+    reach-chains thousands deep and overflow Python's recursion limit.
+    Cycle-safe: NHD flowline graphs are NOT always forests (coastal tidal
+    channels, canals, braided and divergent reaches form cycles), so a
+    back-edge to a node already on the DFS stack is skipped rather than
+    re-pushed. A naive post-order re-pushes cycle nodes forever, which is
+    what made coastal tiles hang and grow memory until OOM.
     """
     order: dict[int, int] = {}
-
-    def visit(node: int) -> int:
-        kids = children_of.get(node, [])
-        if not kids:
-            order[node] = 1
-            return 1
-        child_orders = [visit(k) for k in kids]
-        m = max(child_orders)
-        n = child_orders.count(m)
-        order[node] = m if n == 1 else m + 1
-        return order[node]
-
     for r in roots:
-        visit(r)
+        if r in order:
+            continue
+        stack: list[tuple[int, object]] = [(r, iter(children_of.get(r, [])))]
+        onstack: set[int] = {r}
+        while stack:
+            node, it = stack[-1]
+            descended = False
+            for child in it:
+                if child in order or child in onstack:
+                    continue  # finalized, or a back-edge (cycle): skip
+                stack.append((child, iter(children_of.get(child, []))))
+                onstack.add(child)
+                descended = True
+                break
+            if descended:
+                continue
+            kids = [c for c in children_of.get(node, []) if c in order]
+            if not kids:
+                order[node] = 1
+            else:
+                co = [order[k] for k in kids]
+                m = max(co)
+                order[node] = m if co.count(m) == 1 else m + 1
+            onstack.discard(node)
+            stack.pop()
     return order
 
 
 def stats_from_flowlines(
-    path, *, snap_tolerance: float = 1e-4, area_km2: float | None = None
+    path,
+    *,
+    snap_tolerance: float = 1e-4,
+    area_km2: float | None = None,
+    clip_bbox: tuple[float, float, float, float] | None = None,
 ) -> BranchingStats:
     """Build a network from flow-oriented line segments and summarize it.
 
@@ -82,6 +106,10 @@ def stats_from_flowlines(
         snap_tolerance: degrees within which endpoints are treated as the
             same node (1e-4 deg ~ 11 m at the equator).
         area_km2: tile area for drainage density; if None, density is NaN.
+        clip_bbox: if set, (min_lon, min_lat, max_lon, max_lat) to clip the
+            flowlines to before building the graph. Used when the DEM side
+            was windowed, so the NHD reference covers the same extent as the
+            windowed PH/whitebox network rather than the full tile.
 
     Returns:
         BranchingStats. Direction is inferred from vertex order: the last
@@ -97,6 +125,9 @@ def stats_from_flowlines(
     geojson_path = path
 
     gdf = gpd.read_file(geojson_path)
+    if clip_bbox is not None and len(gdf):
+        min_lon, min_lat, max_lon, max_lat = clip_bbox
+        gdf = gdf.cx[min_lon:max_lon, min_lat:max_lat]
 
     def snap(pt):
         return (round(pt[0] / snap_tolerance), round(pt[1] / snap_tolerance))

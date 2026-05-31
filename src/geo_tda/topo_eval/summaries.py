@@ -84,31 +84,27 @@ def h1_cubical_mask(mask: np.ndarray) -> int:
     1-complex with 8-adjacency edges. The donor flow graph is a forest so
     its H1 is 0; any positive value here is spatial-adjacency
     contamination the donor-graph construction removes.
+
+    Vectorized: vertices and the four forward-direction edge counts come
+    from shifted-array AND-reductions, and components from one
+    scipy.ndimage.label pass with full 8-connectivity. This replaces the
+    per-cell Python set/union-find, which built multi-million-element tuple
+    sets on real 1-degree masks (hours of runtime and the memory blowup
+    that swamped the cluster node). The E - V + C formula is unchanged.
     """
-    H, W = mask.shape
-    cells = [(i, j) for i in range(H) for j in range(W) if mask[i, j]]
-    cell_set = set(cells)
-    edges: set[tuple[tuple[int, int], tuple[int, int]]] = set()
-    for i, j in cells:
-        for dy, dx in EIGHT_NEIGHBORS:
-            n = (i + dy, j + dx)
-            if n in cell_set:
-                edges.add(tuple(sorted([(i, j), n])))
+    from scipy import ndimage
 
-    parent: dict[tuple[int, int], tuple[int, int]] = {c: c for c in cells}
-
-    def find(x):
-        while parent[x] != x:
-            parent[x] = parent[parent[x]]
-            x = parent[x]
-        return x
-
-    for a, b in edges:
-        ra, rb = find(a), find(b)
-        if ra != rb:
-            parent[ra] = rb
-    components = len({find(c) for c in cells})
-    return len(edges) - len(cells) + components
+    m = np.asarray(mask, dtype=bool)
+    V = int(m.sum())
+    if V == 0:
+        return 0
+    # count each undirected 8-adjacency edge once via four forward shifts
+    E = int((m[:, :-1] & m[:, 1:]).sum())       # E
+    E += int((m[:-1, :] & m[1:, :]).sum())       # S
+    E += int((m[:-1, :-1] & m[1:, 1:]).sum())    # SE
+    E += int((m[:-1, 1:] & m[1:, :-1]).sum())    # SW
+    _labels, components = ndimage.label(m, structure=np.ones((3, 3), dtype=int))
+    return E - V + components
 
 
 def cubical_confluence_cells(

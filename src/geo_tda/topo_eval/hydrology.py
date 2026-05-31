@@ -22,17 +22,26 @@ import numpy as np
 from geo_tda.topo_eval.merge_tree import D8_OFFSETS
 
 # Whitebox D8 pointer values (powers of two) -> (dy, dx) on a row-major
-# grid where row index increases southward. Whitebox: 1=E, 2=SE, 4=S,
-# 8=SW, 16=W, 32=NW, 64=N, 128=NE.
+# grid where row index increases southward. WhiteboxTools' documented
+# pointer grid is
+#     64 128  1
+#     32   0  2
+#     16   8  4
+# i.e. 1=NE, 2=E, 4=SE, 8=S, 16=SW, 32=W, 64=NW, 128=N. (NOT the ESRI
+# 1=E convention; an earlier table assumed ESRI and was rotated one step,
+# which mis-routed every receiver 45 degrees and shattered the donor graph
+# into one component per cell. Verified empirically against the
+# accumulation gradient on real whitebox output: the true receiver always
+# has strictly higher accumulation, and only this mapping satisfies that.)
 _WBT_POINTER_TO_OFFSET: dict[int, tuple[int, int]] = {
-    1: (0, 1),    # E
-    2: (1, 1),    # SE
-    4: (1, 0),    # S
-    8: (1, -1),   # SW
-    16: (0, -1),  # W
-    32: (-1, -1), # NW
-    64: (-1, 0),  # N
-    128: (-1, 1), # NE
+    1: (-1, 1),   # NE
+    2: (0, 1),    # E
+    4: (1, 1),    # SE
+    8: (1, 0),    # S
+    16: (1, -1),  # SW
+    32: (0, -1),  # W
+    64: (-1, -1), # NW
+    128: (-1, 0), # N
 }
 
 # (dy, dx) -> receiver code index into D8_OFFSETS
