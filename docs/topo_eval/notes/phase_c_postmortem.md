@@ -206,4 +206,9 @@ because they handle topological change by construction with no heuristic
 surgery. The donor graph's claim has the same shape, an acyclic channel
 network by construction with no phantom cycles, which is why validity parity
 is sufficient and the structural guarantee is the contribution rather than a
-scalar margin.
+scalar margin. Size the analogy to what it does: it illuminates the
+contribution shape (parity plus a by-construction guarantee is a legitimate
+result), not the magnitude. Level sets earned that framing across a large
+body of topology-change problems; here the guarantee is one property
+(acyclicity) shown on one toy and twenty tiles. Borrow the logic, not the
+stature.
