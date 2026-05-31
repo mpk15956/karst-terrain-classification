@@ -164,3 +164,46 @@ code, verified by reverting the fix). The recurring failure shape
 ([[whitebox-d8-pointer-convention]]) and guarded by a test. The saddle-level
 confound this surfaced for Milestone 2 is in
 [m2_reference_forward_feed.md](m2_reference_forward_feed.md).
+
+## Decided framing (ratified 2026-05-31)
+
+Supersedes the candidate paragraph above. The Phase C validation section is
+written as construct validity carried by parity, with the comparative
+advantage carried by a structural guarantee rather than a scalar margin. The
+weighting is set by whether each result was predicted in advance, which is
+the hygiene mechanism (predicted = confirmatory and load-bearing; unpredicted
+= exploratory and demoted), not by which result is more favorable.
+
+1. **Primary, pre-registered: construct validity.** The donor-graph merge
+   tree matches the WhiteboxTools agreement ceiling with NHD on junction
+   correlation (0.936 vs 0.935) and Strahler Wasserstein (0.287 vs 0.287),
+   and is within the pre-registered 95% bound on R_b. The metric recovers
+   real channel networks. This is the correctly-scoped result, not a timid
+   one: the paper's novelty is upstream (the theorem stack, flow-accumulation
+   as the filtration, the generative-model evaluation regime), so the
+   validation section does not need to carry novelty and should not try to.
+
+2. **Comparative advantage, structural and predicted: H1 = 0 by
+   construction.** The D8 donor relation is a function, so the donor-graph
+   channel network is acyclic by construction. Spatial 8-adjacency stream
+   extraction admits phantom confluences on subparallel tributaries and
+   spurious loops on meander necks; the donor graph cannot. Predicted by the
+   Phase 0 spike (cubical H1 = 8 vs donor 0) and the proof, confirmed at scale
+   (median ~48,500 cycles per tile removed across 20 tiles). This is a
+   structural guarantee, not a statistical claim, so it carries the advantage
+   without needing n or significance testing. This is the load-bearing
+   adjacency contribution.
+
+3. **Favorable hint, exploratory: the R_b gap (0.185 vs 0.375).** One
+   criterion, n = 20, a basin-scoped scalar from the family that produced the
+   pointer-bug artifact. Reported, not leaned on, explicitly flagged for
+   dedicated comparative-advantage analysis. It carries nothing it cannot
+   bear.
+
+Analogy that fixes the weighting (Osher-Sethian level sets, 1988): level sets
+did not win by beating explicit meshes on static-droplet accuracy; they won
+because they handle topological change by construction with no heuristic
+surgery. The donor graph's claim has the same shape, an acyclic channel
+network by construction with no phantom cycles, which is why validity parity
+is sufficient and the structural guarantee is the contribution rather than a
+scalar margin.
