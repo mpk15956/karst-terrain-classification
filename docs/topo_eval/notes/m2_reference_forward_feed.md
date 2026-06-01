@@ -61,6 +61,21 @@ density and the tau rule, rather than only the tau value used at 3DEP
 resolution, is what makes a substrate swap mechanical instead of a
 re-derivation.
 
+**Empirically confirmed (resolution-confound probe,
+`scripts/resolution_confound_probe.py`).** On matched real-vs-real pairs, the
+donor-graph channel network at the NHD-density-matched tau agrees between 3DEP
+(~3612 px) and GLO-30 (3600 px) across all three provinces: net
+Strahler-Wasserstein 0.009-0.023 (against the ~0.29 PH-vs-NHD scale), junction
+counts within ~10%, and the GLO-30 donor graph is connected on every tile
+(roots 81-283, so the whitebox-pointer fix is substrate-general). The
+mitigation survives the hard case: on the flattest coastal tile (n30w083) the
+raw 3DEP/GLO-30 elevation correlation is only 0.842 (small relief, so
+sensor/vintage differences are a large fraction of it), yet the
+density-matched networks still agree (net SW 0.021). So at matched density the
+metric is resolution-invariant and the M2 cross-substrate comparison is sound;
+the resolution confound is benign as long as density is matched. Result:
+results/validity/teach_run_20260530/resolution_probe.json.
+
 ## The Milestone 2 reference is re-acquired, not reused verbatim
 
 The consequence: the Milestone 2 real reference for a given generator is

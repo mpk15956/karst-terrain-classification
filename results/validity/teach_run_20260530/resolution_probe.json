@@ -1,0 +1,209 @@
+{
+  "summary": {
+    "n_tiles": 6,
+    "elev_corr_median": 0.9871191364401817,
+    "net_strahler_wasserstein_median": 0.017219254275993023,
+    "glo30_max_roots": 283,
+    "note": "low net_strahler_wasserstein + GLO-30 roots small (connected) => metric resolution-invariant at matched density; high SW => resolution confound material, M2 must hold resolution constant."
+  },
+  "rows": [
+    {
+      "key": "n30w083",
+      "nhd_density": 0.6319920306931223,
+      "elev_corr": 0.8424091560460608,
+      "dep": {
+        "tau": 1615.0,
+        "grid": [
+          3612,
+          3612
+        ],
+        "roots": 85,
+        "junctions": 2148,
+        "h1_cubical": 6728,
+        "drainage_density": 0.6320111910147863
+      },
+      "glo30": {
+        "tau": 1673.0,
+        "grid": [
+          3600,
+          3600
+        ],
+        "roots": 81,
+        "junctions": 2205,
+        "h1_cubical": 7479,
+        "drainage_density": 0.6320456920522177
+      },
+      "net_agreement": {
+        "junction_3dep": 2148,
+        "junction_glo30": 2205,
+        "strahler_wasserstein": 0.02118291756548163,
+        "bifurcation_abs_diff": 0.002504482769007943
+      }
+    },
+    {
+      "key": "n31w085",
+      "nhd_density": 0.9440058533693584,
+      "elev_corr": 0.9816142008851868,
+      "dep": {
+        "tau": 566.0,
+        "grid": [
+          3612,
+          3612
+        ],
+        "roots": 112,
+        "junctions": 6206,
+        "h1_cubical": 14863,
+        "drainage_density": 0.9445419743888592
+      },
+      "glo30": {
+        "tau": 625.0,
+        "grid": [
+          3600,
+          3600
+        ],
+        "roots": 127,
+        "junctions": 5896,
+        "h1_cubical": 15531,
+        "drainage_density": 0.9446763942556696
+      },
+      "net_agreement": {
+        "junction_3dep": 6206,
+        "junction_glo30": 5896,
+        "strahler_wasserstein": 0.01900399754909532,
+        "bifurcation_abs_diff": 0.27630133941578716
+      }
+    },
+    {
+      "key": "n32w082",
+      "nhd_density": 1.2970398450698504,
+      "elev_corr": 0.9500449864840468,
+      "dep": {
+        "tau": 348.0,
+        "grid": [
+          3612,
+          3612
+        ],
+        "roots": 127,
+        "junctions": 10034,
+        "h1_cubical": 25497,
+        "drainage_density": 1.2982236005276009
+      },
+      "glo30": {
+        "tau": 345.0,
+        "grid": [
+          3600,
+          3600
+        ],
+        "roots": 176,
+        "junctions": 10859,
+        "h1_cubical": 24123,
+        "drainage_density": 1.2987253803549788
+      },
+      "net_agreement": {
+        "junction_3dep": 10034,
+        "junction_glo30": 10859,
+        "strahler_wasserstein": 0.0232439133181217,
+        "bifurcation_abs_diff": 0.060108655722365345
+      }
+    },
+    {
+      "key": "n35w084",
+      "nhd_density": 2.4037455207731506,
+      "elev_corr": 0.9997337001872787,
+      "dep": {
+        "tau": 77.0,
+        "grid": [
+          3612,
+          3612
+        ],
+        "roots": 319,
+        "junctions": 44548,
+        "h1_cubical": 100424,
+        "drainage_density": 2.4164762309801886
+      },
+      "glo30": {
+        "tau": 70.0,
+        "grid": [
+          3600,
+          3600
+        ],
+        "roots": 283,
+        "junctions": 47047,
+        "h1_cubical": 125329,
+        "drainage_density": 2.404623671957695
+      },
+      "net_agreement": {
+        "junction_3dep": 44548,
+        "junction_glo30": 47047,
+        "strahler_wasserstein": 0.015434511002890727,
+        "bifurcation_abs_diff": 0.01169496523283331
+      }
+    },
+    {
+      "key": "n35w081",
+      "nhd_density": 1.851078142083033,
+      "elev_corr": 0.9926240719951764,
+      "dep": {
+        "tau": 133.0,
+        "grid": [
+          3612,
+          3612
+        ],
+        "roots": 251,
+        "junctions": 26837,
+        "h1_cubical": 48896,
+        "drainage_density": 1.852502134295586
+      },
+      "glo30": {
+        "tau": 152.0,
+        "grid": [
+          3600,
+          3600
+        ],
+        "roots": 219,
+        "junctions": 24588,
+        "h1_cubical": 54833,
+        "drainage_density": 1.8552431342406903
+      },
+      "net_agreement": {
+        "junction_3dep": 26837,
+        "junction_glo30": 24588,
+        "strahler_wasserstein": 0.011769670103051078,
+        "bifurcation_abs_diff": 2.8568498406780383
+      }
+    },
+    {
+      "key": "n37w082",
+      "nhd_density": 1.737075455697006,
+      "elev_corr": 0.9984552802975316,
+      "dep": {
+        "tau": 136.0,
+        "grid": [
+          3612,
+          3612
+        ],
+        "roots": 262,
+        "junctions": 24087,
+        "h1_cubical": 47963,
+        "drainage_density": 1.737867239779522
+      },
+      "glo30": {
+        "tau": 129.0,
+        "grid": [
+          3600,
+          3600
+        ],
+        "roots": 258,
+        "junctions": 24782,
+        "h1_cubical": 53936,
+        "drainage_density": 1.7399508127802852
+      },
+      "net_agreement": {
+        "junction_3dep": 24087,
+        "junction_glo30": 24782,
+        "strahler_wasserstein": 0.00930634907975425,
+        "bifurcation_abs_diff": 0.023123345410121177
+      }
+    }
+  ]
+}
