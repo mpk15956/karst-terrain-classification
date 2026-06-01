@@ -64,8 +64,15 @@ GAP_MIN = 0.40       # asymmetry gap (Thm 3): median(rr_B noise) minus
                      # fraction of a real change while H0 is not. A gap, not a
                      # quotient, so it degrades gracefully at the noise floor.
 
-NOISE_SIGMAS_M = (0.25, 0.5, 1.0)   # additive Gaussian noise, sub-meter
+# White additive noise was REJECTED (open note): sub-meter white noise flips
+# millions of D8 receivers (wholesale rerouting), unrepresentative of
+# generator-vs-real differences, which are spatially CORRELATED. The probe
+# uses correlated perturbations at graded amplitude (generator-like regime).
+CORR_LEN_PX = 4                     # spatial correlation length (generator-like)
+CORR_AMPS_M = (0.5, 1.0, 2.0, 4.0)  # graded amplitude -> the sensitivity curve
 N_SEEDS = 3
+TARGET_F = 0.15                     # constant control f for a consistent unit
+                                    # across tiles (interpolated); <= min(max f)
 SMOOTH_SIGMAS_PX = (1.0, 2.0)       # Gaussian smoothing (generator analog)
 CONTROL_LENFRACS = (0.34, 0.67, 1.0)  # megachannel length frac -> increasing f
 F_CONTROL_MIN = 0.20  # a trustworthy unit needs >=1 genuinely large reroute (this f)
@@ -170,6 +177,18 @@ def _mass_moved_fraction(accum_orig, accum_pert) -> float:
     return float(np.abs(accum_pert.astype(float) - accum_orig.astype(float)).sum() / (2 * denom))
 
 
+def _interp_unit(controls, key, target_f):
+    """Control-induced movement interpolated at a constant f, so the
+    normalizing unit is consistent across tiles (fixes the cross-tile rr
+    incomparability from variable control f). Falls back to the max-f control
+    if target_f exceeds this tile's reach."""
+    pts = sorted(((c["f"], c[key]) for c in controls), key=lambda t: t[0])
+    fs = [f for f, _ in pts]; vs = [v for _, v in pts]
+    if not fs or target_f > fs[-1]:
+        return max(vs) if vs else 0.0
+    return float(np.interp(target_f, fs, vs))
+
+
 def _flips(codes_a, codes_b) -> int:
     return int(np.count_nonzero(codes_a != codes_b))
 
@@ -233,8 +252,8 @@ def main() -> int:
                     "b": _branching_shift(ph0, ph_c),
                     "flips": _flips(codes0, codes_c),
                 })
-            u_h0 = max(c["sw_h0"] for c in controls)   # unit of a real change
-            u_b = max(c["b"] for c in controls)
+            u_h0 = _interp_unit(controls, "sw_h0", TARGET_F)  # consistent unit
+            u_b = _interp_unit(controls, "b", TARGET_F)
 
             def record(kind, arr_p):
                 dgm_p, ph_p, codes_p, _ = _summaries_for_array(arr_p, profile, tau, wd)
@@ -246,17 +265,19 @@ def main() -> int:
                         "rr_b": b / u_b if u_b > 0 else float("nan")}
 
             perts = []
-            for sigma in NOISE_SIGMAS_M:
+            for amp in CORR_AMPS_M:
                 for _ in range(N_SEEDS):
-                    perts.append(record(f"noise_{sigma}", arr0 + rng.normal(0, sigma, arr0.shape)))
+                    cn = gaussian_filter(rng.normal(0, 1, arr0.shape), CORR_LEN_PX)
+                    cn *= amp / (cn.std() or 1.0)   # correlated field, amplitude amp (m)
+                    perts.append(record(f"corr_{amp}", arr0 + cn))
             for sg in SMOOTH_SIGMAS_PX:
                 perts.append(record(f"smooth_{sg}", gaussian_filter(arr0, sg)))
 
             rows.append({"key": key, "tau": float(tau),
                          "controls": controls, "perturbations": perts})
             print(f"{key}: controls f={[round(c['f'],3) for c in controls]} "
-                  f"u_h0={u_h0:.3g}; noise rr_h0="
-                  f"{[round(p['rr_h0'],3) for p in perts if p['kind'].startswith('noise')]}")
+                  f"u_h0={u_h0:.3g}; corr rr_h0="
+                  f"{[round(p['rr_h0'],3) for p in perts if p['kind'].startswith('corr')]}")
         except Exception as exc:  # noqa: BLE001 - per-tile isolation
             print(f"tile {key} failed: {exc}")
         finally:
@@ -273,14 +294,29 @@ def main() -> int:
     return 0
 
 
+def _flip_curve(noise):
+    if not noise:
+        return []
+    fl = np.array([p["flips"] for p in noise], float)
+    rr = np.array([p["rr_h0"] for p in noise], float)
+    edges = np.quantile(fl, [0, .25, .5, .75, 1.0])
+    out = []
+    for lo, hi in zip(edges[:-1], edges[1:]):
+        m = (fl >= lo) & (fl <= hi)
+        if m.any():
+            out.append({"flips_lo": float(lo), "flips_hi": float(hi),
+                        "rr_h0_median": float(np.nanmedian(rr[m])), "n": int(m.sum())})
+    return out
+
+
 def _evaluate(rows) -> dict:
     """Apply the four pre-registered invariants over informative instances."""
     noise = [p for r in rows for p in r["perturbations"]
-             if p["kind"].startswith("noise") and p["flips"] >= F_MIN]
+             if p["kind"].startswith("corr") and p["flips"] >= F_MIN]
     smooth = [p for r in rows for p in r["perturbations"]
               if p["kind"].startswith("smooth")]
     excluded = sum(1 for r in rows for p in r["perturbations"]
-                   if p["kind"].startswith("noise") and p["flips"] < F_MIN)
+                   if p["kind"].startswith("corr") and p["flips"] < F_MIN)
     if not noise:
         return {"status": "no informative noise instances (raise sigma)"}
     rr_h0 = np.array([p["rr_h0"] for p in noise], dtype=float)
@@ -303,8 +339,12 @@ def _evaluate(rows) -> dict:
         "asymmetry_gap": med_b - p95_h0,
         "asymmetry_pass": bool((med_b - p95_h0) >= GAP_MIN),
         "smoothing_rr_h0_median": float(np.nanmedian([p["rr_h0"] for p in smooth])) if smooth else None,
-        "note": "n supports non-overlap/effect-size separation, not p-values; "
-        "smoothing reported (M2 signal), not gated by S_STABLE",
+        "curve_rr_h0_by_flipbin": _flip_curve(noise),
+        "note": "CHARACTERIZATION, not a gate. Correlated (generator-like) "
+        "regime; constant-f unit. The flip->rr_h0 curve is the pre-MESA "
+        "artifact; the M2 operating point and the saddle verdict are read by "
+        "measuring MESA real-vs-generated H0 movement DIRECTLY (flip-count is "
+        "not assumed a sufficient statistic). n supports non-overlap, not p.",
     }
 
 

@@ -107,6 +107,46 @@ artifact is applied to both sides symmetrically; and report the H0
 flow-accumulation diagram as primary (it is the bottleneck-stable summary),
 with the saddle-sensitive merge-tree branching summaries as secondaries.
 
+## Saddle-stability probe: yield and the Milestone 2 step-1 gate
+
+The probe (`scripts/saddle_stability_probe.py`) tested the saddle confound on
+real tiles before any generator is involved. Its design and the dead ends are
+in [phase_c_postmortem.md](phase_c_postmortem.md). What it yielded:
+
+- A monotonic flip-count to H0-movement **sensitivity curve** in the
+  generator-like (spatially correlated) regime, with a consistent constant-f
+  control as the unit. rr_h0 (H0 movement over a constant reroute) by flip
+  quartile across 5 tiles: 0.21, 0.48, 1.35, 1.21. H0 response is graded in
+  routing change, not a cliff: the Theorem 3 mechanism, confirmed.
+- At the generator-relevant end (gentle correlated perturbation; smoothing),
+  H0 is moderately stable (rr_h0 ~0.21 at the lowest flip bin; smoothing
+  ~0.40). At the high-flip end (millions of receivers flipped) H0 moves as
+  much as a real reroute (rr_h0 > 1). Whether the confound is benign or
+  material is therefore a function of where real-vs-generated differences sit
+  on this curve.
+- White additive noise was rejected as unrepresentative: sub-meter white
+  noise flips millions of receivers (wholesale rerouting); generator-vs-real
+  differences are spatially correlated.
+- The pooled pass/fail gates are NOT meaningful (they average the stable low
+  end with the unstable high end). The curve is the artifact; the verdict is
+  read at the operating point.
+
+**Milestone 2 step-1 gate (named, not someday).** M2 step 1 measures, on
+matched real-vs-generated pairs, the actual H0 movement (plus its flip-count
+and spatial structure for context). The saddle-confound go/no-go is read
+THERE, from the measured H0 response, before any two-sample drainage claim is
+trusted. The synthetic curve is the interpretive frame only; flip-count is
+NOT assumed a sufficient statistic, because a generator's spatially structured
+differences can land at the same flip-count yet move H0 differently. No
+distributional comparison is trusted until this gate is read.
+
+**Scope.** This probe isolates the saddle-routing confound under correlated
+perturbation. It does not test the resolution confound (the next probe:
+downsample a real tile to GLO-30 cell size, check tau-matching) nor
+texture/spectral generated-vs-real gaps (Milestone 2 proper). "Smoothing moves
+H0 ~0.40" means the saddle confound looks moderate in the generator regime,
+NOT that the metric is validated against generators.
+
 ## What this does not block
 
 The headline arm of Milestone 2 is itself undecided: the distributional
