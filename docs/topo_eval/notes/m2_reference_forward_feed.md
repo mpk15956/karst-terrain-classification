@@ -127,9 +127,12 @@ in [phase_c_postmortem.md](phase_c_postmortem.md). What it yielded:
 - White additive noise was rejected as unrepresentative: sub-meter white
   noise flips millions of receivers (wholesale rerouting); generator-vs-real
   differences are spatially correlated.
-- The pooled pass/fail gates are NOT meaningful (they average the stable low
-  end with the unstable high end). The curve is the artifact; the verdict is
-  read at the operating point.
+- The pooled stability/asymmetry pass-fail gates are **superseded by design**:
+  they average the stable low-flip end with the unstable high-flip end of a
+  graded response, so they are meaningless once the response is known to be
+  graded. The result JSON carries them only as machine fields; do not quote
+  "stability gate: fail" bare. The curve is the artifact and the operating
+  point (below) is where the verdict is rendered.
 
 **Milestone 2 step-1 gate (named, not someday).** M2 step 1 measures, on
 matched real-vs-generated pairs, the actual H0 movement (plus its flip-count

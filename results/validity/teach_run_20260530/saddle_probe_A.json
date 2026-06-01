@@ -744,5 +744,6 @@
         }
       ]
     }
-  ]
+  ],
+  "_interpretation": "Pooled stability_pass/asymmetry_pass are SUPERSEDED BY DESIGN: they average the stable low-flip end with the unstable high-flip end of a graded response, so they are meaningless once the response is known to be graded. Read curve_rr_h0_by_flipbin (the artifact) and the M2 step-1 gate, NOT the pooled booleans."
 }
