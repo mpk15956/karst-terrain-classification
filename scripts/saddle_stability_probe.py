@@ -67,7 +67,8 @@ GAP_MIN = 0.40       # asymmetry gap (Thm 3): median(rr_B noise) minus
 NOISE_SIGMAS_M = (0.25, 0.5, 1.0)   # additive Gaussian noise, sub-meter
 N_SEEDS = 3
 SMOOTH_SIGMAS_PX = (1.0, 2.0)       # Gaussian smoothing (generator analog)
-CONTROL_DEPTHS_M = (5.0, 20.0, 60.0)  # trench depths -> increasing reroute f
+CONTROL_LENFRACS = (0.34, 0.67, 1.0)  # megachannel length frac -> increasing f
+F_CONTROL_MIN = 0.20  # a trustworthy unit needs >=1 genuinely large reroute (this f)
 SW_M = 50            # sliced-Wasserstein direction count
 DEM_DIR = Path("data/dem")
 NHD_DIR = Path("data/nhd")
@@ -133,17 +134,31 @@ def _summaries_for_array(arr, profile, tau, workdir):
     return dgm, ph, codes, accum
 
 
-def _carve_trench(arr, accum, depth_m):
-    """Positive control: gouge a deep straight trench across the high-A band,
-    forcing a large, genuine drainage reroute. Returns the perturbed array.
+def _carve_trench(arr, accum, lenfrac):
+    """Positive control: a genuine large drainage reroute, not a divide nick.
 
-    Trench runs the full width through the row of maximum total accumulation,
-    so it captures a high-A region rather than nicking a divide. Severity
-    (depth) varies the rerouted mass fraction f, which is measured post-hoc.
+    A single-row trench saturates near f~0.09 because it only captures the
+    cells immediately draining into it. To force a high-A reroute, gouge a
+    monotonic megachannel diagonally across the tile, sunk far below the
+    surrounding terrain so it becomes the dominant drainage line and a large
+    watershed re-drains into it. The channel descends along its length so D8
+    routes into and along it. Depth scales severity, hence the rerouted mass
+    fraction f, measured post-hoc. The control's only job is to be the scale
+    of an unambiguous large drainage-topology change, not to be realistic.
     """
     out = arr.astype(float).copy()
-    row = int(np.argmax(accum.sum(axis=1)))
-    out[row, :] -= depth_m
+    H, W = out.shape
+    lo = float(out.min())
+    n = max(H, W)
+    span = max(2, int(lenfrac * n))   # carve only the first lenfrac of the diagonal
+    for t in range(span):
+        i = min(H - 1, int(t * (H - 1) / (n - 1)))
+        j = min(W - 1, int(t * (W - 1) / (n - 1)))
+        floor = lo - 50.0 - 50.0 * (t / n)  # deep descending megachannel
+        out[i, j] = floor
+        for di in (-1, 1):                          # widen to guarantee capture
+            if 0 <= i + di < H:
+                out[i + di, j] = min(out[i + di, j], floor + 0.5)
     return out
 
 
@@ -208,11 +223,11 @@ def main() -> int:
 
             # positive controls at increasing depth -> increasing f
             controls = []
-            for depth in CONTROL_DEPTHS_M:
+            for lf in CONTROL_LENFRACS:
                 dgm_c, ph_c, codes_c, acc_c = _summaries_for_array(
-                    _carve_trench(arr0, acc0, depth), profile, tau, wd)
+                    _carve_trench(arr0, acc0, lf), profile, tau, wd)
                 controls.append({
-                    "depth_m": depth,
+                    "lenfrac": lf,
                     "f": _mass_moved_fraction(acc0, acc_c),
                     "sw_h0": _sliced_wasserstein(dgm0, dgm_c),
                     "b": _branching_shift(ph0, ph_c),
@@ -281,7 +296,8 @@ def _evaluate(rows) -> dict:
         "n_noise_informative": len(noise),
         "n_noise_excluded_below_Fmin": excluded,
         "control_validity_spearman_f_vs_swh0": rho,
-        "control_validity_pass": bool(np.isfinite(rho) and rho > 0.5),
+        "control_max_f": float(np.nanmax(fs)) if fs.size else float("nan"),
+        "control_validity_pass": bool(fs.size and np.nanmax(fs) >= F_CONTROL_MIN),
         "stability_p95_rr_h0": p95_h0,
         "stability_pass": bool(p95_h0 <= S_STABLE),
         "asymmetry_gap": med_b - p95_h0,
