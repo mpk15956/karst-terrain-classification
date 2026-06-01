@@ -62,19 +62,29 @@ resolution, is what makes a substrate swap mechanical instead of a
 re-derivation.
 
 **Empirically confirmed (resolution-confound probe,
-`scripts/resolution_confound_probe.py`).** On matched real-vs-real pairs, the
-donor-graph channel network at the NHD-density-matched tau agrees between 3DEP
-(~3612 px) and GLO-30 (3600 px) across all three provinces: net
-Strahler-Wasserstein 0.009-0.023 (against the ~0.29 PH-vs-NHD scale), junction
-counts within ~10%, and the GLO-30 donor graph is connected on every tile
-(roots 81-283, so the whitebox-pointer fix is substrate-general). The
-mitigation survives the hard case: on the flattest coastal tile (n30w083) the
-raw 3DEP/GLO-30 elevation correlation is only 0.842 (small relief, so
-sensor/vintage differences are a large fraction of it), yet the
-density-matched networks still agree (net SW 0.021). So at matched density the
-metric is resolution-invariant and the M2 cross-substrate comparison is sound;
-the resolution confound is benign as long as density is matched. Result:
+`scripts/resolution_confound_probe.py`), led by the case that could have broken
+it.** The hard case is the flattest coastal tile (n30w083), where 3DEP and
+GLO-30 genuinely disagree on absolute elevation (raw correlation 0.842, because
+the relief is small so sensor/vintage differences are a large fraction of it):
+there the density-matched donor-graph networks STILL agree (net
+Strahler-Wasserstein 0.021). The mitigation is tested, not just confirmed on
+easy data. The surrounding distribution holds it: across all three provinces,
+net Strahler-Wasserstein 0.009-0.023 (against the ~0.29 PH-vs-NHD scale),
+junction counts within ~10%, and the GLO-30 donor graph connected on every tile
+(roots 81-283, so the whitebox-pointer fix is substrate-general). So at matched
+density the metric is resolution-invariant and the M2 cross-substrate
+comparison is sound. Result:
 results/validity/teach_run_20260530/resolution_probe.json.
+
+**Scope (CONUS dependency).** The reason the confound is benign is that the
+density anchor absorbs the resolution difference, and the anchor is an
+NHD-derived quantity. NHD is CONUS-only. So what is validated is precisely:
+for CONUS footprints where NHD supplies a density target, matched-density tau
+makes the donor-graph network resolution-invariant. That is exactly what M2
+needs for the global generators sampled at the CONUS footprints, so it
+suffices. The unscoped claim "the metric is resolution-invariant" is stronger
+than shown and would mislead anyone extending this off-CONUS, where the anchor
+is unavailable and the invariance is not established.
 
 ## The Milestone 2 reference is re-acquired, not reused verbatim
 
@@ -149,14 +159,28 @@ in [phase_c_postmortem.md](phase_c_postmortem.md). What it yielded:
   "stability gate: fail" bare. The curve is the artifact and the operating
   point (below) is where the verdict is rendered.
 
-**Milestone 2 step-1 gate (named, not someday).** M2 step 1 measures, on
-matched real-vs-generated pairs, the actual H0 movement (plus its flip-count
-and spatial structure for context). The saddle-confound go/no-go is read
-THERE, from the measured H0 response, before any two-sample drainage claim is
-trusted. The synthetic curve is the interpretive frame only; flip-count is
-NOT assumed a sufficient statistic, because a generator's spatially structured
-differences can land at the same flip-count yet move H0 differently. No
-distributional comparison is trusted until this gate is read.
+**Milestone 2 step-1 gate (named, corrected to a distributional null).** An
+earlier draft of this gate said "measure real-vs-generated H0 movement and read
+it against the curve." That is a category error: MESA is not a digital twin of
+a real tile, it generates plausible terrain from a prompt, so a pairwise
+real-vs-generated H0 distance is large by design (different terrains) and the
+self-perturbation curve (DEM vs a perturbation of ITSELF) is not its scale.
+There is no pairing to read on the curve.
+
+The correct gate is distributional, with a real-vs-real null. M2 step 1
+establishes the null: the sliced-Wasserstein MMD between two same-distribution
+real H0-diagram subpopulations at matched density. That floor includes sampling
+variation AND saddle-routing noise. The verdict: the generated population's
+MMD-to-real, by permutation test, either sits WITHIN the null band (the
+generated terrains span the real drainage-topology distribution: valid
+alternative realizations, no pathology) or EXCEEDS it significantly (a
+systematic displacement of the H0 distribution: drainage pathology). Because
+the null absorbs saddle-routing noise, a generated population within the null
+has any saddle-noise-like H0 component indistinguishable from real variation,
+which is how this gate controls the saddle confound. The self-perturbation
+curve characterized the mechanism (H0 graded in routing change, far more stable
+than branching); it is NOT the gate instrument. No two-sample drainage claim is
+trusted until the generated-vs-real MMD is read against the real-vs-real null.
 
 **Scope.** This probe isolates the saddle-routing confound under correlated
 perturbation. It does not test the resolution confound (the next probe:
