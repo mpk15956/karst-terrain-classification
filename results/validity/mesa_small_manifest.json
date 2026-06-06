@@ -1,0 +1,189 @@
+{
+  "prompts": {
+    "cumberland_plateau": "A Sentinel-2 image of a forested dissected sandstone plateau with deep steep-walled valleys",
+    "appalachian_highlands": "A Sentinel-2 image of forested parallel mountain ridges and intervening valleys",
+    "coastal_plain": "A Sentinel-2 image of low-relief coastal plain with forests and wetlands"
+  },
+  "patches": [
+    {
+      "file": "cumberland_plateau_000.npy",
+      "province": "cumberland_plateau",
+      "prompt": "A Sentinel-2 image of a forested dissected sandstone plateau with deep steep-walled valleys",
+      "seed": 1000,
+      "steps": 50,
+      "guidance": 7.5,
+      "dem_min": 0.03515625,
+      "dem_max": 0.9990234375,
+      "dem_mean": 0.49738460779190063,
+      "dem_std": 0.19879013299942017
+    },
+    {
+      "file": "cumberland_plateau_001.npy",
+      "province": "cumberland_plateau",
+      "prompt": "A Sentinel-2 image of a forested dissected sandstone plateau with deep steep-walled valleys",
+      "seed": 1001,
+      "steps": 50,
+      "guidance": 7.5,
+      "dem_min": 0.0,
+      "dem_max": 0.9041340947151184,
+      "dem_mean": 0.5435044765472412,
+      "dem_std": 0.1905207633972168
+    },
+    {
+      "file": "cumberland_plateau_002.npy",
+      "province": "cumberland_plateau",
+      "prompt": "A Sentinel-2 image of a forested dissected sandstone plateau with deep steep-walled valleys",
+      "seed": 1002,
+      "steps": 50,
+      "guidance": 7.5,
+      "dem_min": 0.0,
+      "dem_max": 0.8243815302848816,
+      "dem_mean": 0.5166038870811462,
+      "dem_std": 0.14084415137767792
+    },
+    {
+      "file": "cumberland_plateau_003.npy",
+      "province": "cumberland_plateau",
+      "prompt": "A Sentinel-2 image of a forested dissected sandstone plateau with deep steep-walled valleys",
+      "seed": 1003,
+      "steps": 50,
+      "guidance": 7.5,
+      "dem_min": 0.02994791604578495,
+      "dem_max": 0.9947916865348816,
+      "dem_mean": 0.5315759181976318,
+      "dem_std": 0.20703844726085663
+    },
+    {
+      "file": "cumberland_plateau_004.npy",
+      "province": "cumberland_plateau",
+      "prompt": "A Sentinel-2 image of a forested dissected sandstone plateau with deep steep-walled valleys",
+      "seed": 1004,
+      "steps": 50,
+      "guidance": 7.5,
+      "dem_min": 0.03084309957921505,
+      "dem_max": 0.9085286259651184,
+      "dem_mean": 0.5152647495269775,
+      "dem_std": 0.18784283101558685
+    },
+    {
+      "file": "appalachian_highlands_000.npy",
+      "province": "appalachian_highlands",
+      "prompt": "A Sentinel-2 image of forested parallel mountain ridges and intervening valleys",
+      "seed": 1005,
+      "steps": 50,
+      "guidance": 7.5,
+      "dem_min": 0.0520833320915699,
+      "dem_max": 0.7791340947151184,
+      "dem_mean": 0.4925318956375122,
+      "dem_std": 0.13158836960792542
+    },
+    {
+      "file": "appalachian_highlands_001.npy",
+      "province": "appalachian_highlands",
+      "prompt": "A Sentinel-2 image of forested parallel mountain ridges and intervening valleys",
+      "seed": 1006,
+      "steps": 50,
+      "guidance": 7.5,
+      "dem_min": 0.0323893241584301,
+      "dem_max": 0.8201497197151184,
+      "dem_mean": 0.5099179148674011,
+      "dem_std": 0.14793725311756134
+    },
+    {
+      "file": "appalachian_highlands_002.npy",
+      "province": "appalachian_highlands",
+      "prompt": "A Sentinel-2 image of forested parallel mountain ridges and intervening valleys",
+      "seed": 1007,
+      "steps": 50,
+      "guidance": 7.5,
+      "dem_min": 0.0762532576918602,
+      "dem_max": 0.9010416865348816,
+      "dem_mean": 0.4779569208621979,
+      "dem_std": 0.13883550465106964
+    },
+    {
+      "file": "appalachian_highlands_003.npy",
+      "province": "appalachian_highlands",
+      "prompt": "A Sentinel-2 image of forested parallel mountain ridges and intervening valleys",
+      "seed": 1008,
+      "steps": 50,
+      "guidance": 7.5,
+      "dem_min": 0.3072916567325592,
+      "dem_max": 0.7078450322151184,
+      "dem_mean": 0.5581441521644592,
+      "dem_std": 0.0852353423833847
+    },
+    {
+      "file": "appalachian_highlands_004.npy",
+      "province": "appalachian_highlands",
+      "prompt": "A Sentinel-2 image of forested parallel mountain ridges and intervening valleys",
+      "seed": 1009,
+      "steps": 50,
+      "guidance": 7.5,
+      "dem_min": 0.1639811247587204,
+      "dem_max": 0.873046875,
+      "dem_mean": 0.5197145938873291,
+      "dem_std": 0.13573502004146576
+    },
+    {
+      "file": "coastal_plain_000.npy",
+      "province": "coastal_plain",
+      "prompt": "A Sentinel-2 image of low-relief coastal plain with forests and wetlands",
+      "seed": 1010,
+      "steps": 50,
+      "guidance": 7.5,
+      "dem_min": 0.064453125,
+      "dem_max": 0.9807942509651184,
+      "dem_mean": 0.4937700629234314,
+      "dem_std": 0.1492401361465454
+    },
+    {
+      "file": "coastal_plain_001.npy",
+      "province": "coastal_plain",
+      "prompt": "A Sentinel-2 image of low-relief coastal plain with forests and wetlands",
+      "seed": 1011,
+      "steps": 50,
+      "guidance": 7.5,
+      "dem_min": 0.0906575545668602,
+      "dem_max": 1.0,
+      "dem_mean": 0.5427379608154297,
+      "dem_std": 0.1401008516550064
+    },
+    {
+      "file": "coastal_plain_002.npy",
+      "province": "coastal_plain",
+      "prompt": "A Sentinel-2 image of low-relief coastal plain with forests and wetlands",
+      "seed": 1012,
+      "steps": 50,
+      "guidance": 7.5,
+      "dem_min": 0.0804850235581398,
+      "dem_max": 0.98095703125,
+      "dem_mean": 0.5142136812210083,
+      "dem_std": 0.14742445945739746
+    },
+    {
+      "file": "coastal_plain_003.npy",
+      "province": "coastal_plain",
+      "prompt": "A Sentinel-2 image of low-relief coastal plain with forests and wetlands",
+      "seed": 1013,
+      "steps": 50,
+      "guidance": 7.5,
+      "dem_min": 0.02351888082921505,
+      "dem_max": 0.9905598759651184,
+      "dem_mean": 0.4856325685977936,
+      "dem_std": 0.16202802956104279
+    },
+    {
+      "file": "coastal_plain_004.npy",
+      "province": "coastal_plain",
+      "prompt": "A Sentinel-2 image of low-relief coastal plain with forests and wetlands",
+      "seed": 1014,
+      "steps": 50,
+      "guidance": 7.5,
+      "dem_min": 0.0,
+      "dem_max": 0.9842122197151184,
+      "dem_mean": 0.5300072431564331,
+      "dem_std": 0.1574508547782898
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+target density = 1.732; cpus=16
+real sample=40 patches; mesa=15 patches
+real ok=30; mesa ok=9; mesa err=6
+
+=== scale invariance (A) ===
+  {'mesa': {'n_h0_x1': 1414, 'n_h0_x1000': 1414, 'gini_x1': 0.9829724438622319, 'gini_x1000': 0.9829724438622319, 'identical': True}, 'real': {'n_h0_x1': 1049, 'n_h0_x1000': 1049, 'identical': False}}
+
+=== in-family (B): MESA p50 vs real [p5,p95] ===
+  [OK ] grad_rms_over_range: mesa=0.01436 real=[0.009037,0.04442]
+  [OK ] std_over_range: mesa=0.181 real=[0.1119,0.266]
+  [OK ] accum_gini: mesa=0.9859 real=[0.9822,0.9906]
+  [OK ] accum_top1pct_frac: mesa=0.9155 real=[0.8741,0.9404]
+  [OK ] largest_basin_frac: mesa=0.5368 real=[0.2233,0.7566]
+  [OK ] n_h0_features: mesa=1194 real=[919.6,1215]
+  [OK ] n_roots: mesa=56 real=[38.6,89.85]
+  [OK ] median_persistence_norm: mesa=0.008606 real=[0.005878,0.01933]
+  [OK ] max_persistence_norm: mesa=0.9995 real=[0.9965,0.9996]
+  [OK ] channel_cells: mesa=2.824e+04 real=[2.819e+04,2.826e+04]
+  [OK ] roots_over_channel: mesa=0.001983 real=[0.001369,0.003183]
+
+IN-FAMILY: 11/11 descriptors; wrote results/validity/substrate_comparability.json

@@ -1,0 +1,6 @@
+appalachian_highlands_002.npy: range[0.076,0.901] std0.139 nan=0 uniq=7645 -> OK accum_max=176580
+appalachian_highlands_004.npy: range[0.164,0.873] std0.136 nan=0 uniq=6412 -> OK accum_max=483442
+coastal_plain_000.npy: range[0.064,0.981] std0.149 nan=0 uniq=7556 -> OK accum_max=272864
+coastal_plain_002.npy: range[0.080,0.981] std0.147 nan=0 uniq=7494 -> OK accum_max=328598
+cumberland_plateau_003.npy: range[0.030,0.995] std0.207 nan=0 uniq=8636 -> OK accum_max=225878
+cumberland_plateau_004.npy: range[0.031,0.909] std0.188 nan=0 uniq=8141 -> OK accum_max=179273

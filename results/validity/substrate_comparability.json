@@ -1,0 +1,407 @@
+{
+  "target_density": 1.731947249229926,
+  "n_real": 30,
+  "n_mesa": 9,
+  "real_summary": {
+    "grad_rms_over_range": {
+      "p5": 0.009037496671098934,
+      "p50": 0.02122796533115362,
+      "p95": 0.04442051565785261,
+      "min": 0.007648471362818655,
+      "max": 0.050638510188011056
+    },
+    "std_over_range": {
+      "p5": 0.11193112044679154,
+      "p50": 0.1699291701764593,
+      "p95": 0.2660319391748783,
+      "min": 0.08797252201728183,
+      "max": 0.32196423077660546
+    },
+    "accum_gini": {
+      "p5": 0.9821743390191418,
+      "p50": 0.9877319396264133,
+      "p95": 0.9906030292075042,
+      "min": 0.9815195345374998,
+      "max": 0.9908146251189859
+    },
+    "accum_top1pct_frac": {
+      "p5": 0.8741124781500137,
+      "p50": 0.9202714417467988,
+      "p95": 0.9403887598870595,
+      "min": 0.8663097954293929,
+      "max": 0.9416083164161995
+    },
+    "largest_basin_frac": {
+      "p5": 0.22333611382378474,
+      "p50": 0.4699944390190972,
+      "p95": 0.7565744188096788,
+      "min": 0.19185892740885416,
+      "max": 0.8808848063151041
+    },
+    "n_h0_features": {
+      "p5": 919.6,
+      "p50": 1051.0,
+      "p95": 1214.8999999999999,
+      "min": 855.0,
+      "max": 1291.0
+    },
+    "n_roots": {
+      "p5": 38.6,
+      "p50": 63.5,
+      "p95": 89.84999999999998,
+      "min": 34.0,
+      "max": 111.0
+    },
+    "median_persistence_norm": {
+      "p5": 0.005877845359232289,
+      "p50": 0.010994375192418318,
+      "p95": 0.01932702725245628,
+      "min": 0.0057006640558488,
+      "max": 0.025891855111653102
+    },
+    "max_persistence_norm": {
+      "p5": 0.9964824341946289,
+      "p50": 0.9990089657264634,
+      "p95": 0.9996025353985164,
+      "min": 0.9961471505704161,
+      "max": 0.9997169291738331
+    },
+    "channel_cells": {
+      "p5": 28190.45,
+      "p50": 28212.0,
+      "p95": 28260.1,
+      "min": 28189.0,
+      "max": 28286.0
+    },
+    "roots_over_channel": {
+      "p5": 0.0013690369392384421,
+      "p50": 0.0022510838717676677,
+      "p95": 0.0031831884704494524,
+      "min": 0.001203156516508015,
+      "max": 0.003924202785830446
+    }
+  },
+  "mesa_summary": {
+    "grad_rms_over_range": {
+      "p5": 0.006452005347004537,
+      "p50": 0.014363019364571482,
+      "p95": 0.034809246665544205,
+      "min": 0.00599187390516369,
+      "max": 0.03732873916156733
+    },
+    "std_over_range": {
+      "p5": 0.15643159395423623,
+      "p50": 0.18098924174414455,
+      "p95": 0.21196510091405812,
+      "min": 0.1540683038770706,
+      "max": 0.21279396854588734
+    },
+    "accum_gini": {
+      "p5": 0.9783231323785656,
+      "p50": 0.9859098198768864,
+      "p95": 0.9877961392531737,
+      "min": 0.9752235913894548,
+      "max": 0.9878191090934122
+    },
+    "accum_top1pct_frac": {
+      "p5": 0.8880986644777649,
+      "p50": 0.9154808285079293,
+      "p95": 0.9330890027496443,
+      "min": 0.8839691558999281,
+      "max": 0.9338724389972735
+    },
+    "largest_basin_frac": {
+      "p5": 0.3789232042100694,
+      "p50": 0.5367838541666666,
+      "p95": 0.7492713080512152,
+      "min": 0.3740200466579861,
+      "max": 0.7876536051432291
+    },
+    "n_h0_features": {
+      "p5": 1040.2,
+      "p50": 1194.0,
+      "p95": 2148.2,
+      "min": 1031.0,
+      "max": 2441.0
+    },
+    "n_roots": {
+      "p5": 31.0,
+      "p50": 56.0,
+      "p95": 62.4,
+      "min": 25.0,
+      "max": 64.0
+    },
+    "median_persistence_norm": {
+      "p5": 0.004791682817697277,
+      "p50": 0.00860581401049071,
+      "p95": 0.010979460952234732,
+      "min": 0.0043132628476992615,
+      "max": 0.011266692655684795
+    },
+    "max_persistence_norm": {
+      "p5": 0.9989423328987145,
+      "p50": 0.9995325449767536,
+      "p95": 0.999782500417699,
+      "min": 0.9989141447607485,
+      "max": 0.9998183103359018
+    },
+    "channel_cells": {
+      "p5": 28222.4,
+      "p50": 28243.0,
+      "p95": 28318.2,
+      "min": 28222.0,
+      "max": 28347.0
+    },
+    "roots_over_channel": {
+      "p5": 0.0010976371678686858,
+      "p50": 0.0019831432821021317,
+      "p95": 0.002205798140328999,
+      "min": 0.0008851750876323337,
+      "max": 0.0022652461685484728
+    }
+  },
+  "in_family_verdict": {
+    "grad_rms_over_range": {
+      "real_p5_p95": [
+        0.009037496671098934,
+        0.04442051565785261
+      ],
+      "mesa_p50": 0.014363019364571482,
+      "in_family": true
+    },
+    "std_over_range": {
+      "real_p5_p95": [
+        0.11193112044679154,
+        0.2660319391748783
+      ],
+      "mesa_p50": 0.18098924174414455,
+      "in_family": true
+    },
+    "accum_gini": {
+      "real_p5_p95": [
+        0.9821743390191418,
+        0.9906030292075042
+      ],
+      "mesa_p50": 0.9859098198768864,
+      "in_family": true
+    },
+    "accum_top1pct_frac": {
+      "real_p5_p95": [
+        0.8741124781500137,
+        0.9403887598870595
+      ],
+      "mesa_p50": 0.9154808285079293,
+      "in_family": true
+    },
+    "largest_basin_frac": {
+      "real_p5_p95": [
+        0.22333611382378474,
+        0.7565744188096788
+      ],
+      "mesa_p50": 0.5367838541666666,
+      "in_family": true
+    },
+    "n_h0_features": {
+      "real_p5_p95": [
+        919.6,
+        1214.8999999999999
+      ],
+      "mesa_p50": 1194.0,
+      "in_family": true
+    },
+    "n_roots": {
+      "real_p5_p95": [
+        38.6,
+        89.84999999999998
+      ],
+      "mesa_p50": 56.0,
+      "in_family": true
+    },
+    "median_persistence_norm": {
+      "real_p5_p95": [
+        0.005877845359232289,
+        0.01932702725245628
+      ],
+      "mesa_p50": 0.00860581401049071,
+      "in_family": true
+    },
+    "max_persistence_norm": {
+      "real_p5_p95": [
+        0.9964824341946289,
+        0.9996025353985164
+      ],
+      "mesa_p50": 0.9995325449767536,
+      "in_family": true
+    },
+    "channel_cells": {
+      "real_p5_p95": [
+        28190.45,
+        28260.1
+      ],
+      "mesa_p50": 28243.0,
+      "in_family": true
+    },
+    "roots_over_channel": {
+      "real_p5_p95": [
+        0.0013690369392384421,
+        0.0031831884704494524
+      ],
+      "mesa_p50": 0.0019831432821021317,
+      "in_family": true
+    }
+  },
+  "n_in_family": 11,
+  "n_descriptors": 11,
+  "scale_invariance": {
+    "mesa": {
+      "n_h0_x1": 1414,
+      "n_h0_x1000": 1414,
+      "gini_x1": 0.9829724438622319,
+      "gini_x1000": 0.9829724438622319,
+      "identical": true
+    },
+    "real": {
+      "n_h0_x1": 1049,
+      "n_h0_x1000": 1049,
+      "identical": false
+    }
+  },
+  "mesa_per_patch": [
+    {
+      "grad_rms_over_range": 0.00599187390516369,
+      "std_over_range": 0.18098924174414455,
+      "accum_gini": 0.9829724438622319,
+      "accum_top1pct_frac": 0.9036555583114844,
+      "largest_basin_frac": 0.4391665988498264,
+      "n_h0_features": 1414,
+      "n_roots": 60,
+      "median_persistence_norm": 0.008614799000891786,
+      "max_persistence_norm": 0.9995251533600226,
+      "channel_cells": 28347,
+      "roots_over_channel": 0.0021166260979997883,
+      "tau": 114.0,
+      "file": "appalachian_highlands_000.npy"
+    },
+    {
+      "grad_rms_over_range": 0.007520896811080093,
+      "std_over_range": 0.18779473739723584,
+      "accum_gini": 0.9856586267111747,
+      "accum_top1pct_frac": 0.9338724389972735,
+      "largest_basin_frac": 0.7876536051432291,
+      "n_h0_features": 1709,
+      "n_roots": 55,
+      "median_persistence_norm": 0.005509312772694301,
+      "max_persistence_norm": 0.9997287855403948,
+      "channel_cells": 28275,
+      "roots_over_channel": 0.0019451812555260832,
+      "tau": 105.0,
+      "file": "appalachian_highlands_001.npy"
+    },
+    {
+      "grad_rms_over_range": 0.007142202509765809,
+      "std_over_range": 0.21279396854588734,
+      "accum_gini": 0.9875561287410262,
+      "accum_top1pct_frac": 0.9154808285079293,
+      "largest_basin_frac": 0.6692776150173612,
+      "n_h0_features": 1031,
+      "n_roots": 25,
+      "median_persistence_norm": 0.006752272289718205,
+      "max_persistence_norm": 0.9995389557093496,
+      "channel_cells": 28243,
+      "roots_over_channel": 0.0008851750876323337,
+      "tau": 138.0,
+      "file": "appalachian_highlands_003.npy"
+    },
+    {
+      "grad_rms_over_range": 0.025755137691099675,
+      "std_over_range": 0.1540683038770706,
+      "accum_gini": 0.9836094133864522,
+      "accum_top1pct_frac": 0.8839691558999281,
+      "largest_basin_frac": 0.3740200466579861,
+      "n_h0_features": 1162,
+      "n_roots": 64,
+      "median_persistence_norm": 0.011266692655684795,
+      "max_persistence_norm": 0.9989846151056635,
+      "channel_cells": 28253,
+      "roots_over_channel": 0.0022652461685484728,
+      "tau": 129.0,
+      "file": "coastal_plain_001.npy"
+    },
+    {
+      "grad_rms_over_range": 0.03732873916156733,
+      "std_over_range": 0.16755031786973776,
+      "accum_gini": 0.9877616844928159,
+      "accum_top1pct_frac": 0.9237375475907892,
+      "largest_basin_frac": 0.3965877956814236,
+      "n_h0_features": 1054,
+      "n_roots": 56,
+      "median_persistence_norm": 0.01054861339705964,
+      "max_persistence_norm": 0.9989141447607485,
+      "channel_cells": 28238,
+      "roots_over_channel": 0.0019831432821021317,
+      "tau": 150.0,
+      "file": "coastal_plain_003.npy"
+    },
+    {
+      "grad_rms_over_range": 0.031030007921509516,
+      "std_over_range": 0.1599765290699847,
+      "accum_gini": 0.9866590663348124,
+      "accum_top1pct_frac": 0.9144740197843317,
+      "largest_basin_frac": 0.5367838541666666,
+      "n_h0_features": 1117,
+      "n_roots": 57,
+      "median_persistence_norm": 0.007998850313321204,
+      "max_persistence_norm": 0.9995325449767536,
+      "channel_cells": 28223,
+      "roots_over_channel": 0.002019629380292669,
+      "tau": 143.0,
+      "file": "coastal_plain_004.npy"
+    },
+    {
+      "grad_rms_over_range": 0.026432395386128984,
+      "std_over_range": 0.206242245381364,
+      "accum_gini": 0.9878191090934122,
+      "accum_top1pct_frac": 0.9295578331378174,
+      "largest_basin_frac": 0.6811930338541666,
+      "n_h0_features": 1615,
+      "n_roots": 46,
+      "median_persistence_norm": 0.0043132628476992615,
+      "max_persistence_norm": 0.9998183103359018,
+      "channel_cells": 28222,
+      "roots_over_channel": 0.0016299340939692438,
+      "tau": 72.0,
+      "file": "cumberland_plateau_000.npy"
+    },
+    {
+      "grad_rms_over_range": 0.014363019364571482,
+      "std_over_range": 0.2107217994663143,
+      "accum_gini": 0.9752235913894548,
+      "accum_top1pct_frac": 0.89429292734452,
+      "largest_basin_frac": 0.3862779405381944,
+      "n_h0_features": 2441,
+      "n_roots": 59,
+      "median_persistence_norm": 0.009432223178075457,
+      "max_persistence_norm": 0.9992143471619938,
+      "channel_cells": 28273,
+      "roots_over_channel": 0.002086796590386588,
+      "tau": 73.0,
+      "file": "cumberland_plateau_001.npy"
+    },
+    {
+      "grad_rms_over_range": 0.010133346153912459,
+      "std_over_range": 0.17084826164046446,
+      "accum_gini": 0.9859098198768864,
+      "accum_top1pct_frac": 0.9319138483782006,
+      "largest_basin_frac": 0.6916978624131944,
+      "n_h0_features": 1194,
+      "n_roots": 40,
+      "median_persistence_norm": 0.00860581401049071,
+      "max_persistence_norm": 0.99962743271729,
+      "channel_cells": 28242,
+      "roots_over_channel": 0.0014163302882232137,
+      "tau": 138.0,
+      "file": "cumberland_plateau_002.npy"
+    }
+  ],
+  "note": "Invariance (A): if identical, H0 is scale-free and the [0,1]-vs-meters gap is irrelevant -> no rescale, stated before batch. In-family (B): MESA median must sit in real [p5,p95] per descriptor; grad_rms_over_range and accum concentration are the mush detectors. Read a large MMD2 as drainage divergence only if both pass."
+}
