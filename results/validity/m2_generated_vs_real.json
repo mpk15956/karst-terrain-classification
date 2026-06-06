@@ -1,0 +1,31 @@
+{
+  "target_density": 1.731947249229926,
+  "sw_sigma": 7207221.264717237,
+  "n_real": 226,
+  "n_generated": 114,
+  "tiles_per_group": 10,
+  "reps": 200,
+  "generated_by_province": {
+    "coastal_plain": 34,
+    "cumberland_plateau": 40,
+    "appalachian_highlands": 40
+  },
+  "null_mmd2": {
+    "median": 0.0033043399906901305,
+    "p95": 0.02833976544778819,
+    "max": 0.050900371664543975
+  },
+  "test_mmd2": {
+    "median": 0.08851961546923048,
+    "p5": 0.06261208203131348,
+    "p95": 0.11988829713191532,
+    "min": 0.05037958711608004,
+    "max": 0.15431724708274053
+  },
+  "null_p95_floor": 0.02833976544778819,
+  "test_median_over_floor_ratio": 3.123512635710226,
+  "frac_test_above_floor": 1.0,
+  "p_value_one_sided": 0.0,
+  "reject_H0": true,
+  "note": "Reject H0 (generated drainage topology diverges from real) iff test median MMD^2 > null p95 floor, at matched per-side patch n. Read-out licensed by substrate comparability (divergence, not artifact)."
+}
