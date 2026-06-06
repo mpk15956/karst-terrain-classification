@@ -173,22 +173,56 @@ def main() -> int:
 
     rng = np.random.default_rng(0)
     n_tiles = len(tile_to_idx)
-    sizes = [s for s in (2, 3, 4, 5, 6, 7) if 2 * s <= n_tiles]
-    curve = power_curve_indexed(tile_to_idx, D, sizes, reps=80, rng=rng, sigma=sigma)
+    # sweep to the MAX balanced spatial split the corpus supports (2*s <= n_tiles),
+    # not an arbitrary cap -- the tightest floor lives at the largest split.
+    sizes = [s for s in range(2, n_tiles // 2 + 1) if 2 * s <= n_tiles]
+    curve = power_curve_indexed(tile_to_idx, D, sizes, reps=120, rng=rng, sigma=sigma)
+
+    # Operating point = the largest balanced split (tightest floor, most
+    # patches/side). The generated-vs-real test MUST be run at this per-side
+    # PATCH count so test-n == null-n by construction (MMD^2 bias/variance are
+    # n-dependent). A MESA call emits exactly one 768px patch, so the generation
+    # target is a patch count, drawn in the real reference's 7:7:6 province mix.
+    op = curve[-1] if curve else None
+    gen_patches = int(round(op["patches_per_side_mean"])) if op else None
+    prov_counts = {}
+    for t in tiles:
+        prov_counts[t["province"]] = prov_counts.get(t["province"], 0) + 1
+    total = sum(prov_counts.values())
+    gen_alloc = ({p: int(round(gen_patches * c / total)) for p, c in prov_counts.items()}
+                 if gen_patches else None)
+
     out = {"target_density": target_density, "n_tiles": n_tiles,
            "n_patches": len(flat), "sw_sigma": sigma,
            "patches_per_tile": {k: len(v) for k, v in tile_to_idx.items()},
            "spatial_null_power_curve": curve,
-           "note": "null split is by TILE (spatial). N for generation = size "
-           "where p95 is tight enough to clear a difference; the band is the "
-           "floor generated-vs-real MMD2 must exceed. Real-vs-real values ARE "
-           "the null (dry-fire: should sit near 0)."}
+           "operating_point": op,
+           "generation_target": {
+               "patches_total": gen_patches,
+               "by_province": gen_alloc,
+               "province_mix_source": "real reference corpus (FORCED mirror, "
+               "not a chosen N): generated mix = real mix so the two-sample MMD "
+               "cannot read province-mix as topology",
+               "patch_size_px": PATCH,
+               "rationale": "test-n == null-n: generate this many 768px patches "
+               "so the generated-vs-real MMD2 is computed at the same per-side "
+               "patch count as the spatial null's operating point"},
+           "note": "Null split is by TILE (spatial), reported in PATCHES (the "
+           "MMD unit). The band (p95) is the floor generated-vs-real MMD2 must "
+           "exceed AT THE SAME per-side patch n. Real-vs-real medians are the "
+           "biased-estimator O(1/n) floor (test vs the empirical band, not vs "
+           "0). N is set in patches, not tiles."}
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(out, indent=2))
-    print("\n=== spatial-split null band vs tiles-per-group ===")
+    print("\n=== spatial-split null band vs tiles-per-group (n in PATCHES/side) ===")
     for r in curve:
-        print(f"  {r['tiles_per_group']}/grp: median={r['null_mmd2_median']:.4g} "
+        print(f"  {r['tiles_per_group']} tiles/grp (~{r['patches_per_side_mean']:.0f} "
+              f"patches/side): median={r['null_mmd2_median']:.4g} "
               f"p95={r['null_mmd2_p95']:.4g} max={r['null_mmd2_max']:.4g} (reps {r['reps']})")
+    if op:
+        print(f"\nOPERATING POINT: {op['tiles_per_group']} tiles/side "
+              f"(~{gen_patches} patches/side), floor p95={op['null_mmd2_p95']:.4g}")
+        print(f"GENERATION TARGET: {gen_patches} patches in {gen_alloc} (province mix)")
     print(f"wrote {args.out}")
     return 0
 

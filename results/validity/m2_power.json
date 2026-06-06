@@ -28,46 +28,105 @@
   "spatial_null_power_curve": [
     {
       "tiles_per_group": 2,
-      "reps": 80,
-      "null_mmd2_median": 0.014570613764179563,
-      "null_mmd2_p95": 0.13061522369916484,
+      "reps": 120,
+      "patches_per_side_mean": 22.35,
+      "patches_per_side_min": 14,
+      "null_mmd2_median": 0.016016044569088006,
+      "null_mmd2_p95": 0.11558495513192563,
       "null_mmd2_max": 0.201324582715797
     },
     {
       "tiles_per_group": 3,
-      "reps": 80,
-      "null_mmd2_median": 0.018539017892753473,
-      "null_mmd2_p95": 0.0818936564220507,
-      "null_mmd2_max": 0.11282262944290622
+      "reps": 120,
+      "patches_per_side_mean": 33.983333333333334,
+      "patches_per_side_min": 23,
+      "null_mmd2_median": 0.019196705056810037,
+      "null_mmd2_p95": 0.09203387782886417,
+      "null_mmd2_max": 0.14598231126170846
     },
     {
       "tiles_per_group": 4,
-      "reps": 80,
-      "null_mmd2_median": 0.010116688817571662,
-      "null_mmd2_p95": 0.06265263049690871,
-      "null_mmd2_max": 0.0982696184086509
+      "reps": 120,
+      "patches_per_side_mean": 45.09166666666667,
+      "patches_per_side_min": 34,
+      "null_mmd2_median": 0.009470657828048346,
+      "null_mmd2_p95": 0.058921900116894625,
+      "null_mmd2_max": 0.09023991736863457
     },
     {
       "tiles_per_group": 5,
-      "reps": 80,
-      "null_mmd2_median": 0.008080297755643562,
-      "null_mmd2_p95": 0.05754204131853628,
-      "null_mmd2_max": 0.07116952931516152
+      "reps": 120,
+      "patches_per_side_mean": 56.358333333333334,
+      "patches_per_side_min": 45,
+      "null_mmd2_median": 0.0074374149991203176,
+      "null_mmd2_p95": 0.047365514100182006,
+      "null_mmd2_max": 0.08877259386884062
     },
     {
       "tiles_per_group": 6,
-      "reps": 80,
-      "null_mmd2_median": 0.0049531937855260555,
-      "null_mmd2_p95": 0.04856921186127845,
-      "null_mmd2_max": 0.09207484227761853
+      "reps": 120,
+      "patches_per_side_mean": 67.725,
+      "patches_per_side_min": 56,
+      "null_mmd2_median": 0.004929984331652371,
+      "null_mmd2_p95": 0.051511235501840225,
+      "null_mmd2_max": 0.09642366720846307
     },
     {
       "tiles_per_group": 7,
-      "reps": 80,
-      "null_mmd2_median": 0.0039846139923020996,
-      "null_mmd2_p95": 0.033816640282697194,
-      "null_mmd2_max": 0.04725675732982482
+      "reps": 120,
+      "patches_per_side_mean": 79.275,
+      "patches_per_side_min": 66,
+      "null_mmd2_median": 0.004054200814664566,
+      "null_mmd2_p95": 0.0297468081506851,
+      "null_mmd2_max": 0.04698538269461827
+    },
+    {
+      "tiles_per_group": 8,
+      "reps": 120,
+      "patches_per_side_mean": 90.27083333333333,
+      "patches_per_side_min": 75,
+      "null_mmd2_median": 0.00583405775952861,
+      "null_mmd2_p95": 0.031011301358948293,
+      "null_mmd2_max": 0.06317002513653502
+    },
+    {
+      "tiles_per_group": 9,
+      "reps": 120,
+      "patches_per_side_mean": 101.6875,
+      "patches_per_side_min": 87,
+      "null_mmd2_median": 0.0029860013580093048,
+      "null_mmd2_p95": 0.028008830195279343,
+      "null_mmd2_max": 0.05359984737820733
+    },
+    {
+      "tiles_per_group": 10,
+      "reps": 120,
+      "patches_per_side_mean": 113.0,
+      "patches_per_side_min": 98,
+      "null_mmd2_median": 0.0041967538558077555,
+      "null_mmd2_p95": 0.026271690823360665,
+      "null_mmd2_max": 0.040515110817878064
     }
   ],
-  "note": "null split is by TILE (spatial). N for generation = size where p95 is tight enough to clear a difference; the band is the floor generated-vs-real MMD2 must exceed. Real-vs-real values ARE the null (dry-fire: should sit near 0)."
+  "operating_point": {
+    "tiles_per_group": 10,
+    "reps": 120,
+    "patches_per_side_mean": 113.0,
+    "patches_per_side_min": 98,
+    "null_mmd2_median": 0.0041967538558077555,
+    "null_mmd2_p95": 0.026271690823360665,
+    "null_mmd2_max": 0.040515110817878064
+  },
+  "generation_target": {
+    "patches_total": 113,
+    "by_province": {
+      "cumberland_plateau": 40,
+      "coastal_plain": 34,
+      "appalachian_highlands": 40
+    },
+    "province_mix_source": "real reference corpus (FORCED mirror, not a chosen N): generated mix = real mix so the two-sample MMD cannot read province-mix as topology",
+    "patch_size_px": 768,
+    "rationale": "test-n == null-n: generate this many 768px patches so the generated-vs-real MMD2 is computed at the same per-side patch count as the spatial null's operating point"
+  },
+  "note": "Null split is by TILE (spatial), reported in PATCHES (the MMD unit). The band (p95) is the floor generated-vs-real MMD2 must exceed AT THE SAME per-side patch n. Real-vs-real medians are the biased-estimator O(1/n) floor (test vs the empirical band, not vs 0). N is set in patches, not tiles."
 }

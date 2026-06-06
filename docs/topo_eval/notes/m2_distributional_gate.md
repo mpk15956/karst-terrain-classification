@@ -21,6 +21,7 @@ it; FID/CLIP-FID are computed and reported alongside.
 The generated conditioning distribution is fixed to mirror the real
 population's province proportions, taken from the manifest province labels
 (NOT tuned against MESA output):
+
 - cumberland_plateau: 7/20
 - appalachian_highlands: 7/20
 - coastal_plain: 6/20
@@ -67,10 +68,13 @@ different statistic), learned from free real-data resampling, not after a GPU
 batch. The power analysis is the greenlight criterion for the generation batch.
 
 > Result (2026-06-06, `docs/topo_eval/notes/m2_power_result.md`): the
-> spatial-split null tightens monotonically to a p95 floor of ~0.034 MMD^2 at
-> the 7+7 split and does not plateau wide — the design is powered. Generate N=20
-> in the 7:7:6 proportions (or N~10-14 as a cost compromise); N=2-3 is
-> underpowered. Greenlight criterion MET.
+> spatial-split null tightens monotonically (in PATCHES, the MMD unit) to a p95
+> floor of **0.0263 MMD^2** at the max balanced split, 10 tiles/side ≈ 113
+> patches/side — the design is powered. N is set in patches, not tiles: generate
+> **113 patches** (one per MESA call) so the generated-vs-real test runs at the
+> SAME per-side patch count as the null (test-n ≡ null-n). The 7:7:6 (≈40:40:34)
+> mix is the FORCED mirror of the real reference corpus, not a chosen N.
+> Greenlight criterion MET.
 
 ## Density control
 

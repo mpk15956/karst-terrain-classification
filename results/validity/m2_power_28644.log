@@ -1,0 +1,20 @@
+common target density = 1.732 km/km2; cpus=24
+loaded cached diagrams
+226 patches over 20 tiles; computing SW matrix on 24 cores...
+loaded cached SW matrix
+SW matrix done; sigma=7.207e+06
+
+=== spatial-split null band vs tiles-per-group (n in PATCHES/side) ===
+  2 tiles/grp (~22 patches/side): median=0.01602 p95=0.1156 max=0.2013 (reps 120)
+  3 tiles/grp (~34 patches/side): median=0.0192 p95=0.09203 max=0.146 (reps 120)
+  4 tiles/grp (~45 patches/side): median=0.009471 p95=0.05892 max=0.09024 (reps 120)
+  5 tiles/grp (~56 patches/side): median=0.007437 p95=0.04737 max=0.08877 (reps 120)
+  6 tiles/grp (~68 patches/side): median=0.00493 p95=0.05151 max=0.09642 (reps 120)
+  7 tiles/grp (~79 patches/side): median=0.004054 p95=0.02975 max=0.04699 (reps 120)
+  8 tiles/grp (~90 patches/side): median=0.005834 p95=0.03101 max=0.06317 (reps 120)
+  9 tiles/grp (~102 patches/side): median=0.002986 p95=0.02801 max=0.0536 (reps 120)
+  10 tiles/grp (~113 patches/side): median=0.004197 p95=0.02627 max=0.04052 (reps 120)
+
+OPERATING POINT: 10 tiles/side (~113 patches/side), floor p95=0.02627
+GENERATION TARGET: 113 patches in {'cumberland_plateau': 40, 'coastal_plain': 34, 'appalachian_highlands': 40} (province mix)
+wrote results/validity/m2_power.json

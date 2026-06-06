@@ -108,8 +108,16 @@ def global_sigma(D) -> float:
 
 
 def spatial_split_null_indexed(tile_to_idx: dict, D, tiles_per_group: int,
-                               reps: int, rng, sigma: float) -> list[float]:
-    """Real-vs-real MMD^2 under SPATIAL (by-tile) splits, via the SW matrix."""
+                               reps: int, rng, sigma: float) -> list[dict]:
+    """Real-vs-real MMD^2 under SPATIAL (by-tile) splits, via the SW matrix.
+
+    Returns one dict per rep: {"mmd2", "n_a", "n_b"} where n_a/n_b are the
+    PATCH counts pooled on each side. The patch count is the real unit the
+    test will be run at, so it is reported alongside the statistic -- the
+    generated-vs-real test must be run at the SAME per-side patch n as the
+    null, or it clears a floor measured at a different sample size (MMD^2 bias
+    and variance are both n-dependent; see the O(1/n) dry-fire bias).
+    """
     tiles = list(tile_to_idx); out = []
     for _ in range(reps):
         if len(tiles) < 2 * tiles_per_group:
@@ -118,7 +126,8 @@ def spatial_split_null_indexed(tile_to_idx: dict, D, tiles_per_group: int,
         ia = [i for k in p[:tiles_per_group] for i in tile_to_idx[tiles[k]]]
         ib = [i for k in p[tiles_per_group:2 * tiles_per_group] for i in tile_to_idx[tiles[k]]]
         if ia and ib:
-            out.append(mmd2_from_matrix(D, ia, ib, sigma))
+            out.append({"mmd2": mmd2_from_matrix(D, ia, ib, sigma),
+                        "n_a": len(ia), "n_b": len(ib)})
     return out
 
 
@@ -126,12 +135,16 @@ def power_curve_indexed(tile_to_idx: dict, D, sizes, reps: int, rng,
                         sigma: float) -> list[dict]:
     rows = []
     for s in sizes:
-        n = spatial_split_null_indexed(tile_to_idx, D, s, reps, rng, sigma)
-        if n:
-            rows.append({"tiles_per_group": int(s), "reps": len(n),
-                         "null_mmd2_median": float(np.median(n)),
-                         "null_mmd2_p95": float(np.percentile(n, 95)),
-                         "null_mmd2_max": float(np.max(n))})
+        recs = spatial_split_null_indexed(tile_to_idx, D, s, reps, rng, sigma)
+        if recs:
+            m = [r["mmd2"] for r in recs]
+            per_side = [(r["n_a"] + r["n_b"]) / 2 for r in recs]
+            rows.append({"tiles_per_group": int(s), "reps": len(recs),
+                         "patches_per_side_mean": float(np.mean(per_side)),
+                         "patches_per_side_min": int(min(min(r["n_a"], r["n_b"]) for r in recs)),
+                         "null_mmd2_median": float(np.median(m)),
+                         "null_mmd2_p95": float(np.percentile(m, 95)),
+                         "null_mmd2_max": float(np.max(m))})
     return rows
 
 
