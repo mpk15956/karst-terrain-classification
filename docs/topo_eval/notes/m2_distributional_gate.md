@@ -66,6 +66,12 @@ is underpowered and the fix is a design change (more real footprints, a
 different statistic), learned from free real-data resampling, not after a GPU
 batch. The power analysis is the greenlight criterion for the generation batch.
 
+> Result (2026-06-06, `docs/topo_eval/notes/m2_power_result.md`): the
+> spatial-split null tightens monotonically to a p95 floor of ~0.034 MMD^2 at
+> the 7+7 split and does not plateau wide — the design is powered. Generate N=20
+> in the 7:7:6 proportions (or N~10-14 as a cost compromise); N=2-3 is
+> underpowered. Greenlight criterion MET.
+
 ## Density control
 
 Both populations' H0 diagrams are built at a COMMON target drainage density

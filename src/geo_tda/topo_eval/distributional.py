@@ -86,6 +86,55 @@ def spatial_split_null(pop_by_tile: dict, tiles_per_group: int, reps: int,
     return out
 
 
+def mmd2_from_matrix(D, idx_a, idx_b, sigma) -> float:
+    """Biased MMD^2 from a PRECOMPUTED SW distance matrix D over all items.
+
+    The matrix is computed once; every MMD is an index lookup, so the power
+    analysis does not recompute millions of pairwise SW distances. sigma is
+    fixed globally (not per split) so kernels are comparable across reps.
+    """
+    ia = np.asarray(idx_a); ib = np.asarray(idx_b)
+    K = np.exp(-(D ** 2) / (2.0 * sigma ** 2))
+    Kaa = K[np.ix_(ia, ia)]; Kbb = K[np.ix_(ib, ib)]; Kab = K[np.ix_(ia, ib)]
+    na, nb = len(ia), len(ib)
+    saa = (Kaa.sum() - np.trace(Kaa)) / (na * (na - 1)) if na > 1 else 0.0
+    sbb = (Kbb.sum() - np.trace(Kbb)) / (nb * (nb - 1)) if nb > 1 else 0.0
+    return float(saa + sbb - 2 * Kab.mean())
+
+
+def global_sigma(D) -> float:
+    off = D[np.triu_indices(D.shape[0], k=1)]
+    return float(np.median(off[off > 0])) if np.any(off > 0) else 1.0
+
+
+def spatial_split_null_indexed(tile_to_idx: dict, D, tiles_per_group: int,
+                               reps: int, rng, sigma: float) -> list[float]:
+    """Real-vs-real MMD^2 under SPATIAL (by-tile) splits, via the SW matrix."""
+    tiles = list(tile_to_idx); out = []
+    for _ in range(reps):
+        if len(tiles) < 2 * tiles_per_group:
+            break
+        p = rng.permutation(len(tiles))
+        ia = [i for k in p[:tiles_per_group] for i in tile_to_idx[tiles[k]]]
+        ib = [i for k in p[tiles_per_group:2 * tiles_per_group] for i in tile_to_idx[tiles[k]]]
+        if ia and ib:
+            out.append(mmd2_from_matrix(D, ia, ib, sigma))
+    return out
+
+
+def power_curve_indexed(tile_to_idx: dict, D, sizes, reps: int, rng,
+                        sigma: float) -> list[dict]:
+    rows = []
+    for s in sizes:
+        n = spatial_split_null_indexed(tile_to_idx, D, s, reps, rng, sigma)
+        if n:
+            rows.append({"tiles_per_group": int(s), "reps": len(n),
+                         "null_mmd2_median": float(np.median(n)),
+                         "null_mmd2_p95": float(np.percentile(n, 95)),
+                         "null_mmd2_max": float(np.max(n))})
+    return rows
+
+
 def power_curve(pop_by_tile: dict, sizes, reps: int, rng, M: int = 50) -> list[dict]:
     """Null-band (p95 of spatial real-vs-real MMD^2) vs tiles-per-group size."""
     rows = []
