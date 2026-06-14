@@ -1,0 +1,11 @@
+K=10; topology test/floor=3.12x; gen province mix={'coastal_plain': 34, 'appalachian_highlands': 40, 'cumberland_plateau': 40}
+
+[clip/hill] RBF-MMD test/floor=4.36x (reject=True, frac_above=1.00) | best-province-pair/floor=3.5x | FID test/p95=4.07 | KID test/p95=6.72
+
+[clip/stack] RBF-MMD test/floor=4.30x (reject=True, frac_above=1.00) | best-province-pair/floor=2.6x | FID test/p95=2.35 | KID test/p95=5.03
+
+[incep/hill] RBF-MMD test/floor=1.70x (reject=True, frac_above=1.00) | best-province-pair/floor=3.2x | FID test/p95=nan | KID test/p95=1.40
+
+[incep/stack] RBF-MMD test/floor=2.68x (reject=True, frac_above=1.00) | best-province-pair/floor=3.7x | FID test/p95=nan | KID test/p95=2.10
+
+wrote results/validity/m2_optical_contrast.json

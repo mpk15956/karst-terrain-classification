@@ -1,0 +1,138 @@
+{
+  "operating_point_K": 10,
+  "topology_test_over_floor": 3.123512635710226,
+  "gen_province_mix": {
+    "coastal_plain": 34,
+    "appalachian_highlands": 40,
+    "cumberland_plateau": 40
+  },
+  "results": {
+    "clip_hill": {
+      "n_real": 320,
+      "n_gen": 114,
+      "tiles_per_group": 10,
+      "sigma": 3.6724270314864134,
+      "rbf_mmd2": {
+        "null_median": 0.02355630514643603,
+        "null_p95_floor": 0.08313401329420837,
+        "test_median": 0.36233725909807457,
+        "test_over_floor": 4.358471878601309,
+        "frac_test_above_floor": 1.0,
+        "reject": true
+      },
+      "province_pair_mmd2": {
+        "appalachian_highlands|coastal_plain": 0.20000467903285846,
+        "appalachian_highlands|cumberland_plateau": 0.050736501592652195,
+        "coastal_plain|cumberland_plateau": 0.28833259185306437
+      },
+      "province_swap_max_mmd2": 0.28833259185306437,
+      "swap_max_over_floor": 3.4682866907034233,
+      "fid": {
+        "null_median": 2.3069616567222155,
+        "null_p95": 4.472311806100552,
+        "test_median": 18.181624939327076,
+        "test_over_p95": 4.065375073921734
+      },
+      "kid": {
+        "null_median": 0.005558967590332031,
+        "null_p95": 0.01676459312438964,
+        "test_median": 0.11265850067138672,
+        "test_over_p95": 6.720025940115881
+      }
+    },
+    "clip_stack": {
+      "n_real": 320,
+      "n_gen": 114,
+      "tiles_per_group": 10,
+      "sigma": 4.616208505297893,
+      "rbf_mmd2": {
+        "null_median": 0.01912235268713225,
+        "null_p95_floor": 0.04500763840572775,
+        "test_median": 0.19358670025483937,
+        "test_over_floor": 4.301196577117079,
+        "frac_test_above_floor": 1.0,
+        "reject": true
+      },
+      "province_pair_mmd2": {
+        "appalachian_highlands|coastal_plain": 0.11786364657951576,
+        "appalachian_highlands|cumberland_plateau": 0.03579848349276249,
+        "coastal_plain|cumberland_plateau": 0.08339639402419152
+      },
+      "province_swap_max_mmd2": 0.11786364657951576,
+      "swap_max_over_floor": 2.6187476338353317,
+      "fid": {
+        "null_median": 4.8082345432949785,
+        "null_p95": 6.7902704553039355,
+        "test_median": 15.933320083820611,
+        "test_over_p95": 2.3464927043332957
+      },
+      "kid": {
+        "null_median": 0.0063707828521728516,
+        "null_p95": 0.012932610511779777,
+        "test_median": 0.06501293182373047,
+        "test_over_p95": 5.02705403247959
+      }
+    },
+    "incep_hill": {
+      "n_real": 320,
+      "n_gen": 114,
+      "tiles_per_group": 10,
+      "sigma": 10.156577884780624,
+      "rbf_mmd2": {
+        "null_median": 0.021505096926284994,
+        "null_p95_floor": 0.06714949431528448,
+        "test_median": 0.11413812948449376,
+        "test_over_floor": 1.6997615640794748,
+        "frac_test_above_floor": 1.0,
+        "reject": true
+      },
+      "province_pair_mmd2": {
+        "appalachian_highlands|coastal_plain": 0.21474796883666758,
+        "appalachian_highlands|cumberland_plateau": 0.037050205145220616,
+        "coastal_plain|cumberland_plateau": 0.17913518794356165
+      },
+      "province_swap_max_mmd2": 0.21474796883666758,
+      "swap_max_over_floor": 3.198057871119171,
+      "fid": {
+        "skipped": "2048-d FID unstable at n~160; see KID"
+      },
+      "kid": {
+        "null_median": 0.007642269134521484,
+        "null_p95": 0.02792167663574218,
+        "test_median": 0.039128780364990234,
+        "test_over_p95": 1.4013764601407204
+      }
+    },
+    "incep_stack": {
+      "n_real": 320,
+      "n_gen": 114,
+      "tiles_per_group": 10,
+      "sigma": 16.00641602900403,
+      "rbf_mmd2": {
+        "null_median": 0.015828366554909268,
+        "null_p95_floor": 0.03730366349972887,
+        "test_median": 0.09980159614900319,
+        "test_over_floor": 2.6753832408371516,
+        "frac_test_above_floor": 1.0,
+        "reject": true
+      },
+      "province_pair_mmd2": {
+        "appalachian_highlands|coastal_plain": 0.1394141729466134,
+        "appalachian_highlands|cumberland_plateau": 0.02819310674843023,
+        "coastal_plain|cumberland_plateau": 0.10707350517309422
+      },
+      "province_swap_max_mmd2": 0.1394141729466134,
+      "swap_max_over_floor": 3.737278322479686,
+      "fid": {
+        "skipped": "2048-d FID unstable at n~160; see KID"
+      },
+      "kid": {
+        "null_median": 0.014614343643188477,
+        "null_p95": 0.03842115402221678,
+        "test_median": 0.08076620101928711,
+        "test_over_p95": 2.102128451753026
+      }
+    }
+  },
+  "note": "Necessity argument: optical test/floor ~1 (insensitive) while topology=3.12x; province-swap/floor >>1 confirms the optical instrument is powered on appearance shifts. CLIP is the load-bearing backbone; Inception the expected baseline."
+}
