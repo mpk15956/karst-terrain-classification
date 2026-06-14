@@ -155,37 +155,42 @@ is the number WITH a meaning. This is smaller than the original "topology beats
 optical" but it is unassailable and true, and it is what feeds the diffusion
 paper (which needs a physics-grading, not pixel-realism, evaluator).
 
-## Noise-ceiling control (2026-06-14): did NOT yield a clean ceiling
+## Noise control (2026-06-14): NOT a ceiling -- a SECOND characterization
 
 Intended to bracket MESA's 3.12x with a zero-drainage CEILING: phase-randomized
 Fourier surrogates of real patches (identical power spectrum -> terrain-like
 roughness, NOT trivially separable like white noise; randomized phase -> no
-spatial drainage organization). Run through the SAME H0 contrast. Artifacts:
-`results/validity/m2_noise_vs_real.json` + `.log`; `scripts/make_noise_dems.py`.
+spatial drainage organization). Run through the IDENTICAL headline pipeline
+(`m2_generated_vs_real.py`: real diagrams + sw_matrix, fixed real-real sigma,
+K=10 spatial-split null). Artifacts: `results/validity/m2_noise_vs_real.json` +
+`.log`; `scripts/make_noise_dems.py`.
 
-Result: noise-vs-real MMD^2/floor = 2.82x -- comparable to MESA (3.12x), NOT the
-expected >>. Diagnosis (SW distances vs the real-real median sigma=7.21e6):
+In the HEADLINE CURRENCY (MMD^2/floor, same estimator/null/n as the 3.12x):
 
-| population | mean cross SW vs real | internal SW |
+| perturbation/population | MMD^2/floor | what it isolates |
 |---|---|---|
-| real-real | 1.0 sigma (by def.) | 1.0 sigma |
-| phase-noise | 0.97 sigma | 0.69 sigma |
-| MESA | 1.27 sigma | (1.34 sigma) |
+| trench (localized incision) | ~0 | H0 insensitive to localized structure |
+| phase-noise (spectrum kept, phase scrambled) | 2.82x | H0 insensitive to spatial coherence |
+| MESA (over-smooth generator) | 3.12x | H0 sensitive to branching-distribution change |
 
-The phase-randomized surrogate sits AS CLOSE to real on average (0.97 sigma) as
-real is to itself -- because preserving the spectrum keeps its H0 diagrams near
-the real centroid. Its MMD^2 rejection (2.82x) is driven by surrogate
-HOMOGENEITY (internal 0.69 sigma << real's 1.0 sigma), a variance artifact, not
-distance-from-real. So the phase-randomized field is a POOR ceiling.
+So phase-noise sits BELOW MESA in the matched currency (2.82x < 3.12x), NOT above
+-- the intended ceiling did not materialize, and re-running in MMD^2 units does
+not change that (2.82x already IS the MMD^2/floor). A per-pair diagnostic
+explains why: phase-noise cross-distance to real is 0.97 sigma (as close as
+real-real), internal 0.69 sigma (tighter than real's 1.0), while MESA is 1.27
+sigma from real. The 2.82x is largely a surrogate-HOMOGENEITY variance term, not
+distance -- phase-noise reads as NEAR-REAL because preserving the spectrum keeps
+the branching distribution (at matched density) close to real.
 
-The one clean, honest comparable: in raw H0 distance MESA (1.27 sigma) is
-genuinely FARTHER from real than the phase-scrambled surrogate (0.97 sigma) -- so
-MESA's drainage divergence exceeds what destroying all spatial phase (while
-keeping the spectrum) produces. That is the defensible "scale" for the 3.12x; the
-intended MMD^2 ceiling did not materialize.
+Honest reading (the second possibility, confirmed): H0-at-matched-density reads
+PERVASIVE BRANCHING-DISTRIBUTION structure, NOT spatial coherence and NOT
+localized features. The trench (localized, ~0) and the phase-scramble (coherence
+destroyed, spectrum kept, near-real) are TWO CONVERGENT limitation probes that
+bound what the metric reads. MESA diverges (3.12x) because its over-smoothness
+changes the branching distribution itself -- the axis the metric actually reads.
 
-Decision: STOP here -- do NOT chase white-noise or other null variants to
-manufacture a bigger ceiling (that is the post-hoc forking-paths trap). The
-interpretability framing does not depend on a ceiling. Report the cross-distance
-comparison (MESA > phase-scramble) and the MMD^2 variance subtlety honestly as a
-characterization of the statistic, and move on.
+Decision: STOP -- do NOT chase white-noise or other null variants to manufacture
+a ceiling (post-hoc forking-paths). The interpretability framing needs no
+ceiling. Report the two convergent limitation probes (trench, phase-scramble) as
+an honest characterization of the statistic's sensitivity, with all three numbers
+in the single MMD^2/floor currency.
