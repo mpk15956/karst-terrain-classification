@@ -1,0 +1,29 @@
+{
+  "target_density": 1.731947249229926,
+  "sw_sigma": 7207221.264717237,
+  "n_real": 226,
+  "n_generated": 114,
+  "tiles_per_group": 10,
+  "reps": 200,
+  "generated_by_province": {
+    "noise": 114
+  },
+  "null_mmd2": {
+    "median": 0.0033043399906901305,
+    "p95": 0.02833976544778819,
+    "max": 0.050900371664543975
+  },
+  "test_mmd2": {
+    "median": 0.07998713682623315,
+    "p5": 0.05930491106472811,
+    "p95": 0.11184239319416922,
+    "min": 0.053732114055973446,
+    "max": 0.12263031648024336
+  },
+  "null_p95_floor": 0.02833976544778819,
+  "test_median_over_floor_ratio": 2.822434680117504,
+  "frac_test_above_floor": 1.0,
+  "p_value_one_sided": 0.0,
+  "reject_H0": true,
+  "note": "Reject H0 (generated drainage topology diverges from real) iff test median MMD^2 > null p95 floor, at matched per-side patch n. Read-out licensed by substrate comparability (divergence, not artifact)."
+}

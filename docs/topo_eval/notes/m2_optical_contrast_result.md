@@ -154,3 +154,38 @@ detects-but-does-not-localize; gives a number without a meaning. The contributio
 is the number WITH a meaning. This is smaller than the original "topology beats
 optical" but it is unassailable and true, and it is what feeds the diffusion
 paper (which needs a physics-grading, not pixel-realism, evaluator).
+
+## Noise-ceiling control (2026-06-14): did NOT yield a clean ceiling
+
+Intended to bracket MESA's 3.12x with a zero-drainage CEILING: phase-randomized
+Fourier surrogates of real patches (identical power spectrum -> terrain-like
+roughness, NOT trivially separable like white noise; randomized phase -> no
+spatial drainage organization). Run through the SAME H0 contrast. Artifacts:
+`results/validity/m2_noise_vs_real.json` + `.log`; `scripts/make_noise_dems.py`.
+
+Result: noise-vs-real MMD^2/floor = 2.82x -- comparable to MESA (3.12x), NOT the
+expected >>. Diagnosis (SW distances vs the real-real median sigma=7.21e6):
+
+| population | mean cross SW vs real | internal SW |
+|---|---|---|
+| real-real | 1.0 sigma (by def.) | 1.0 sigma |
+| phase-noise | 0.97 sigma | 0.69 sigma |
+| MESA | 1.27 sigma | (1.34 sigma) |
+
+The phase-randomized surrogate sits AS CLOSE to real on average (0.97 sigma) as
+real is to itself -- because preserving the spectrum keeps its H0 diagrams near
+the real centroid. Its MMD^2 rejection (2.82x) is driven by surrogate
+HOMOGENEITY (internal 0.69 sigma << real's 1.0 sigma), a variance artifact, not
+distance-from-real. So the phase-randomized field is a POOR ceiling.
+
+The one clean, honest comparable: in raw H0 distance MESA (1.27 sigma) is
+genuinely FARTHER from real than the phase-scrambled surrogate (0.97 sigma) -- so
+MESA's drainage divergence exceeds what destroying all spatial phase (while
+keeping the spectrum) produces. That is the defensible "scale" for the 3.12x; the
+intended MMD^2 ceiling did not materialize.
+
+Decision: STOP here -- do NOT chase white-noise or other null variants to
+manufacture a bigger ceiling (that is the post-hoc forking-paths trap). The
+interpretability framing does not depend on a ceiling. Report the cross-distance
+comparison (MESA > phase-scramble) and the MMD^2 variance subtlety honestly as a
+characterization of the statistic, and move on.

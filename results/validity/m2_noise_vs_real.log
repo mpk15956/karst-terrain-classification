@@ -1,0 +1,19 @@
+wrote 114 phase-randomized surrogate DEMs to results/validity/noise_batch
+target_density=1.732 sigma=7.207e+06 cpus=24
+real: 226 patches over 20 tiles
+extracting 114 generated patches SERIALLY...
+  20/114 extracted
+  40/114 extracted
+  60/114 extracted
+  80/114 extracted
+  100/114 extracted
+generated ok=114 err=0
+generated: 114 patches
+computing 226x114 cross + 114x114 gen SW on 24 cores...
+
+=== M2 HEADLINE: generated-vs-real drainage-topology MMD ===
+  null  MMD^2: median=0.003304 p95(floor)=0.02834
+  test  MMD^2: median=0.07999 [p5=0.0593, p95=0.1118]
+  test/floor ratio=2.82  frac_above_floor=1.000  p=0
+  REJECT H0: True (generated drainage DIVERGES from real)
+wrote results/validity/m2_noise_vs_real.json
