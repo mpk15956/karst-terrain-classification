@@ -102,3 +102,55 @@ difference is in drainage organization specifically, validated against NHD. This
 is robust to CLIP being a strong detector (we concede detection, claim
 localization) and to the geomorphology venue. The abstract is NOT written until
 the probe's f is in and the branch is known.
+
+## Power-probe RESULT (2026-06-14): none of the three branches fired
+
+Artifacts: `results/validity/m2_power_curve.json` + `.log`, stage outputs under
+`results/validity/m2_power_probe/`. Code: `scripts/m2_power_{perturb,embed,curve}.py`.
+
+The probe produced a FOURTH, unanticipated outcome: the trench is the wrong
+perturbation. Across the f-sweep (mean f 0.05->0.14), in MMD^2/floor currency:
+
+| metric | curve (ratio by level) |
+|---|---|
+| H0 | 0.03, 0.02, -0.05, 0.01, 0.06, -0.13 (flat at ~0) |
+| CLIP / stack | 0.32, 0.56, 0.90, 1.65, 1.41, 1.34 (rises) |
+| Inception / stack | 0.0, 0.44, 1.53, 2.99, 2.74, 2.19 (rises) |
+| CLIP / hill, Incep / hill | <= 0.77 (hillshade weak for thin features) |
+
+H0 does NOT register the trench; optical (stack render) does. The per-pair
+diagnostic confirms it is not a bug: the trench moves a patch's H0 by 0.2-1.2e6
+vs the natural inter-patch SW spread of 7.8e6 (~3-15%). So at matched density H0
+is genuinely INVARIANT to a localized megachannel and responds to PERVASIVE
+branching reorganization (what MESA exhibits, 3.12x) -- a characterization of the
+instrument, not an adjudication of branches 1-3 (all of which assumed H0 fires).
+
+This is ADVERSE to "topology catches what optical misses": we now have a drainage
+change (the trench) optical catches and H0 does not, and NO case of the reverse.
+So orthogonality/complementarity is NOT claimed (the missing quadrant is unmet),
+and the "isolation" reframe is dead. Searching for a new perturbation that fires
+H0-not-optical AFTER seeing this would be post-hoc forking-paths (rejected).
+
+## RESOLUTION: contribution 1 = interpretability, probe = honest limitation
+
+Committed contribution-1 sentence (interpretability-only, needs no probe):
+"Every evaluated metric distinguishes MESA-generated terrain from real, but only
+the flow-accumulation persistence metric NAMES the axis of difference -- it
+reports the divergence as drainage-network organization, validated against NHD
+flowlines, where optical generative metrics give an unlocalized embedding
+distance. Among optical metrics the field-standard Inception-FID is the weakest
+detector (Kynkaanniemi 2023); a richer CLIP detects the gap strongly but as
+overall appearance/fidelity, entangled with geomorphic style (it separates real
+provinces comparably)."
+
+The probe is reported as a LIMITATION / characterization, not hidden: "the
+flow-accumulation metric at matched density is sensitive to pervasive
+drainage-network reorganization and INVARIANT to localized channel incision (the
+trench probe: optical metrics flag the gouge at up to 3x their floor while H0
+stays at its floor)." An adverse, reported stress-test strengthens credibility.
+
+Optical's role is recast from "foil we beat" to "baseline we contextualize":
+detects-but-does-not-localize; gives a number without a meaning. The contribution
+is the number WITH a meaning. This is smaller than the original "topology beats
+optical" but it is unassailable and true, and it is what feeds the diffusion
+paper (which needs a physics-grading, not pixel-realism, evaluator).
