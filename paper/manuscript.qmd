@@ -87,7 +87,7 @@ framing reconciliation):
 - tau is calibrated PER PATCH to a common target drainage density (NHD median 1.732 km/km^2), not an arbitrary grid-cell count. `tau_for_target_density` in `pipeline.py`.
 - TRANSLATION IMPERATIVE (state explicitly): matching tau to a physical NHD density is what makes the metric scale-invariant and maps the topological graph to real hydrology rather than abstraction. D8 routing is order-only, so H0 at matched density is invariant to elevation rescaling (verified: identical H0 feature count at x1 and x1000, `substrate_comparability.json`). Reviewers will target this; lead with the physical meaning.
 
-![From physical terrain to drainage topology on a real GLO-30 patch: (a) hillshade, (b) D8 flow accumulation, (c) channel network at the matched NHD density, (d) the H0 persistence diagram of the donor-graph merge tree. A physical ridgeline dictates the topological split.](figures/fig-pipeline.png){#fig-pipeline width=100%}
+![From physical terrain to drainage topology on a real GLO-30 patch: (a) hillshade, (b) D8 flow accumulation, (c) channel network at the matched NHD density, (d) the H0 persistence diagram of the donor-graph merge tree. A physical ridgeline dictates the topological split.](figures/fig-pipeline.png){#fig-pipeline}
 
 ## Theoretical guarantees (statements here; proofs in Appendix A)
 
@@ -122,7 +122,7 @@ translation BEFORE the reader is asked to care about the proof. -->
   - Pre-registered DESIGN floor: null p95 = 0.0263 (reps 120, `m2_power.json`), used to set the generation target before MESA was run.
   - Headline REALIZED floor: null p95 = 0.0283 (reps 200, `m2_generated_vs_real.json`), the denominator of the 3.12x.
 
-![Spatial-null MMD$^2$ p95 floor versus sample size; the by-tile null tightens monotonically and the K=10 operating point (about 113 patches per side) is fixed before generation.](figures/fig-power.png){#fig-power width=70%}
+![Spatial-null MMD$^2$ p95 floor versus sample size; the by-tile null tightens monotonically and the K=10 operating point (about 113 patches per side) is fixed before generation.](figures/fig-power.png){#fig-power}
 
 # Data and study area
 
@@ -134,7 +134,7 @@ translation BEFORE the reader is asked to care about the proof. -->
 - Tile manifest: 20 one-degree tiles selected across NHD drainage-density quintiles, province mix 7:7:6. 768 px patches (about 23 km). 226 patches with valid H0; per-tile yield 7-14 (mean 11.3). `tile_manifest.json`.
 - MESA generation: province-mirrored prompts, FORCED mirror 40:40:34 (cumberland:appalachian:coastal) = the real reference mix so the two-sample test is not confounded by province mix; n = 114 patches at 768 px. `mesa_batch113_manifest.json`. [NOTE: the generated DEM .npy batch is not in this checkout; needed only for Fig 7.]
 - Hardware floor: reported explicitly (local 12 GB GPU; full-tile runs windowed). Per `_evaluation_conventions.md`.
-![The 20 one-degree study tiles colored by physiographic province; labels give the NHD drainage-density quintile.](figures/fig-studyarea.png){#fig-studyarea width=75%}
+![The 20 one-degree study tiles colored by physiographic province; labels give the NHD drainage-density quintile.](figures/fig-studyarea.png){#fig-studyarea}
 
 # Results
 
@@ -159,9 +159,9 @@ translation BEFORE the reader is asked to care about the proof. -->
 - Qualifier (saddle): the H0 movement sits at 1.27x the real-real baseline, in the high-flip saddle regime (`saddle_probe_A.json`), so the claim is distributional distinguishability of drainage topology, not proven gross network failure.
 {{< include _tables/tbl-headline.md >}}
 
-![Null (real vs real) versus test (generated vs real) MMD$^2$ at the K=10 operating point; the test median sits at 3.12x the p95 floor and no null split exceeds it.](figures/fig-headline.png){#fig-headline width=60%}
+![Null (real vs real) versus test (generated vs real) MMD$^2$ at the K=10 operating point; the test median sits at 3.12x the p95 floor and no null split exceeds it.](figures/fig-headline.png){#fig-headline}
 
-![Looks fine, routes wrong: a real GLO-30 patch and a MESA-generated patch of comparable appearance, with visibly different channel networks and H0 persistence diagrams.](figures/fig-qualitative.png){#fig-qualitative width=90%}
+![Looks fine, routes wrong: a real GLO-30 patch and a MESA-generated patch of comparable appearance, with visibly different channel networks and H0 persistence diagrams.](figures/fig-qualitative.png){#fig-qualitative}
 
 ## Optical contrast: every metric separates, only topology names the axis
 
@@ -171,7 +171,7 @@ translation BEFORE the reader is asked to care about the proof. -->
 - Reading (INTERPRETABILITY, not "blind"): optical detects an unlocalized fidelity gap entangled with geomorphic appearance (CLIP separates generated from real MORE than it separates real provinces); the field-standard Inception is the weakest detector, consistent with @kynkaanniemi2023. Only the flow-accumulation metric names the axis of difference as drainage organization, validated against NHD.
 {{< include _tables/tbl-optical.md >}}
 
-![Optical test/floor ratios (RBF-MMD and KID) for CLIP and Inception, with the province-swap positive control and the topology reference at 3.12x; every optical metric separates generated from real.](figures/fig-optical.png){#fig-optical width=80%}
+![Optical test/floor ratios (RBF-MMD and KID) for CLIP and Inception, with the province-swap positive control and the topology reference at 3.12x; every optical metric separates generated from real.](figures/fig-optical.png){#fig-optical}
 
 ## Sensitivity profile of the metric (not a bracket)
 
@@ -185,7 +185,7 @@ MESA is the LARGEST. No "ceiling". No upper bound claimed. -->
 - Referee-anticipating sentence (commit it): phase-randomized noise reads as closer to real than MESA because scrambling phase preserves the branching distribution the metric is built to read, while MESA changes that distribution.
 {{< include _tables/tbl-sensitivity.md >}}
 
-![Sensitivity profile in matched MMD$^2$/floor currency (trench, phase-noise, MESA) and the saddle-flip caveat; MESA is the largest response and no upper bound is established.](figures/fig-sensitivity.png){#fig-sensitivity width=95%}
+![Sensitivity profile in matched MMD$^2$/floor currency (trench, phase-noise, MESA) and the saddle-flip caveat; MESA is the largest response and no upper bound is established.](figures/fig-sensitivity.png){#fig-sensitivity}
 
 # Discussion
 
