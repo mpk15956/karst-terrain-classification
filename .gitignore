@@ -30,6 +30,8 @@ dist/
 # Keep small results summaries (JSON) tracked; ignore large rasters
 results/**/*.tif
 results/**/*.tiff
+# Figure-input binaries pulled from teach (reproducible; see paper/fig_qual.py)
+results/validity/mesa_fig_samples/
 
 # OS noise
 .DS_Store

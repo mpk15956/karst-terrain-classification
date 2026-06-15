@@ -1,0 +1,8 @@
+# Quarto build artifacts
+manuscript.html
+manuscript.pdf
+manuscript.typ
+manuscript.tex
+manuscript_files/
+/.quarto/
+*_files/

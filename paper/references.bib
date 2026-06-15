@@ -1,0 +1,200 @@
+% references.bib -- focused bibliography for the drainage-aware topological
+% evaluation manuscript. Seeded from docs/literature/052626/1.md and the existing
+% docs/presentation/geog_6591_final_presentation/references.bib.
+% VERIFY at the finishing pass: page numbers, DOIs, and the Suresh et al. 2025
+% author list (marked below) against the published records.
+
+% ---- Case-study generator ----
+@inproceedings{bornepons2025mesa,
+  author    = {Borne-Pons, Paul and Czerkawski, Mikolaj and Martin, Rosalie and Rouffet, Romain},
+  title     = {{MESA}: Text-Driven Terrain Generation Using Latent Diffusion and Global Copernicus Data},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops (MORSE)},
+  year      = {2025},
+  doi       = {10.1109/CVPRW67362.2025.00289},
+  note      = {arXiv:2504.07210}
+}
+
+% ---- Optical generative metrics and the FID critique ----
+@inproceedings{heusel2017fid,
+  author    = {Heusel, Martin and Ramsauer, Hubert and Unterthiner, Thomas and Nessler, Bernhard and Hochreiter, Sepp},
+  title     = {{GANs} Trained by a Two Time-Scale Update Rule Converge to a Local Nash Equilibrium},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2017}
+}
+@inproceedings{binkowski2018kid,
+  author    = {Bi{\'n}kowski, Miko{\l}aj and Sutherland, Danica J. and Arbel, Michael and Gretton, Arthur},
+  title     = {Demystifying {MMD} {GANs}},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2018},
+  note      = {arXiv:1801.01401}
+}
+@inproceedings{kynkaanniemi2023,
+  author    = {Kynk{\"a}{\"a}nniemi, Tuomas and Karras, Tero and Aittala, Miika and Aila, Timo and Lehtinen, Jaakko},
+  title     = {The Role of {ImageNet} Classes in {Fr{\'e}chet} Inception Distance},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2023},
+  note      = {arXiv:2203.06026}
+}
+
+% ---- Two-sample testing and persistence kernels ----
+@article{gretton2012,
+  author  = {Gretton, Arthur and Borgwardt, Karsten M. and Rasch, Malte J. and Sch{\"o}lkopf, Bernhard and Smola, Alexander},
+  title   = {A Kernel Two-Sample Test},
+  journal = {Journal of Machine Learning Research},
+  volume  = {13},
+  pages   = {723--773},
+  year    = {2012}
+}
+@inproceedings{carriere2017,
+  author    = {Carri{\`e}re, Mathieu and Cuturi, Marco and Oudot, Steve},
+  title     = {Sliced {Wasserstein} Kernel for Persistence Diagrams},
+  booktitle = {Proceedings of the 34th International Conference on Machine Learning (ICML)},
+  series    = {PMLR},
+  volume    = {70},
+  pages     = {664--673},
+  year      = {2017}
+}
+
+% ---- Persistent homology foundations ----
+@article{edelsbrunner2002,
+  author  = {Edelsbrunner, Herbert and Letscher, David and Zomorodian, Afra},
+  title   = {Topological Persistence and Simplification},
+  journal = {Discrete \& Computational Geometry},
+  volume  = {28},
+  pages   = {511--533},
+  year    = {2002}
+}
+@article{cohensteiner2007,
+  author  = {Cohen-Steiner, David and Edelsbrunner, Herbert and Harer, John},
+  title   = {Stability of Persistence Diagrams},
+  journal = {Discrete \& Computational Geometry},
+  volume  = {37},
+  number  = {1},
+  pages   = {103--120},
+  year    = {2007}
+}
+
+% ---- Topological evaluation of generative models ----
+@inproceedings{khrulkov2018,
+  author    = {Khrulkov, Valentin and Oseledets, Ivan},
+  title     = {Geometry Score: A Method for Comparing Generative Adversarial Networks},
+  booktitle = {Proceedings of the 35th International Conference on Machine Learning (ICML)},
+  series    = {PMLR},
+  volume    = {80},
+  pages     = {2621--2629},
+  year      = {2018}
+}
+@article{horak2021,
+  author  = {Horak, Danijela and Yu, Simiao and Salimi-Khorshidi, Gholamreza},
+  title   = {Topology Distance: A Topology-Based Approach for Evaluating Generative Adversarial Networks},
+  journal = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume  = {35},
+  number  = {9},
+  pages   = {7721--7728},
+  year    = {2021},
+  doi     = {10.1609/aaai.v35i9.16943}
+}
+@inproceedings{barannikov2021,
+  author    = {Barannikov, Serguei and Trofimov, Ilya and Sotnikov, Grigorii and Trimbach, Ekaterina and Korotin, Alexander and Filippov, Alexander and Burnaev, Evgeny},
+  title     = {Manifold Topology Divergence: A Framework for Comparing Data Manifolds},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2021}
+}
+@inproceedings{suresh2025,
+  author    = {Suresh, others},
+  title     = {Evaluating Generative Models via Cubical Homology Based Persistent Entropy},
+  booktitle = {Proceedings of the ACM SIGKDD Conference on Knowledge Discovery and Data Mining (KDD)},
+  year      = {2025},
+  doi       = {10.1145/3711896.3736943},
+  note      = {VERIFY full author list}
+}
+
+% ---- Watershed / terrain merge-tree prior art ----
+@inproceedings{danner2007terrastream,
+  author    = {Danner, Andrew and M{\o}lhave, Thomas and Yi, Ke and Agarwal, Pankaj K. and Arge, Lars and Mitasova, Helena},
+  title     = {{TerraStream}: From Elevation Data to Watershed Hierarchies},
+  booktitle = {Proceedings of the 15th ACM International Symposium on Geographic Information Systems (ACM GIS)},
+  year      = {2007}
+}
+@article{cousty2009watershed,
+  author  = {Cousty, Jean and Bertrand, Gilles and Najman, Laurent and Couprie, Michel},
+  title   = {Watershed Cuts: Minimum Spanning Forests and the Drop of Water Principle},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  volume  = {31},
+  number  = {8},
+  pages   = {1362--1374},
+  year    = {2009}
+}
+
+% ---- Drainage-network geomorphology ----
+@article{horton1945,
+  author  = {Horton, Robert E.},
+  title   = {Erosional Development of Streams and Their Drainage Basins: Hydrophysical Approach to Quantitative Morphology},
+  journal = {Geological Society of America Bulletin},
+  volume  = {56},
+  number  = {3},
+  pages   = {275--370},
+  year    = {1945}
+}
+@article{strahler1957,
+  author  = {Strahler, Arthur N.},
+  title   = {Quantitative Analysis of Watershed Geomorphology},
+  journal = {Transactions, American Geophysical Union},
+  volume  = {38},
+  number  = {6},
+  pages   = {913--920},
+  year    = {1957}
+}
+@book{rodrigueziturbe1997,
+  author    = {Rodr{\'i}guez-Iturbe, Ignacio and Rinaldo, Andrea},
+  title     = {Fractal River Basins: Chance and Self-Organization},
+  publisher = {Cambridge University Press},
+  year      = {1997}
+}
+@article{ocallaghan1984,
+  author  = {O'Callaghan, John F. and Mark, David M.},
+  title   = {The Extraction of Drainage Networks from Digital Elevation Data},
+  journal = {Computer Vision, Graphics, and Image Processing},
+  volume  = {28},
+  number  = {3},
+  pages   = {323--344},
+  year    = {1984}
+}
+
+% ---- Terrain-specific evaluation ----
+@article{rajasekaran2022ptrm,
+  author  = {Rajasekaran, Suren Deepak and Kang, Hao and {\v{C}}ad{\'i}k, Martin and Galin, Eric and Gu{\'e}rin, Eric and Peytavie, Adrien and Slav{\'i}k, Pavel and Bene{\v{s}}, Bedrich},
+  title   = {{PTRM}: Perceived Terrain Realism Metric},
+  journal = {ACM Transactions on Applied Perception},
+  volume  = {19},
+  number  = {2},
+  year    = {2022},
+  doi     = {10.1145/3514244}
+}
+
+% ---- Tools and data ----
+@article{lindsay2016whitebox,
+  author  = {Lindsay, John B.},
+  title   = {Whitebox {GAT}: A Case Study in Geomorphometric Analysis},
+  journal = {Computers \& Geosciences},
+  volume  = {95},
+  pages   = {75--84},
+  year    = {2016}
+}
+@misc{copernicusdem,
+  author       = {{European Space Agency and Sinergise}},
+  title        = {Copernicus Global Digital Elevation Model ({GLO-30})},
+  year         = {2021},
+  howpublished = {Distributed by OpenTopography / ESA},
+  note         = {VERIFY citation form per Copernicus DEM data license}
+}
+@misc{usgs3dep,
+  author       = {{U.S. Geological Survey}},
+  title        = {{3D} Elevation Program ({3DEP}) Seamless {DEM}},
+  howpublished = {\url{https://www.usgs.gov/3d-elevation-program}}
+}
+@misc{usgsnhd,
+  author       = {{U.S. Geological Survey}},
+  title        = {National Hydrography Dataset ({NHD})},
+  howpublished = {\url{https://www.usgs.gov/national-hydrography}}
+}
