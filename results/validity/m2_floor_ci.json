@@ -1,0 +1,33 @@
+{
+  "sigma": 7207221.264717237,
+  "test_median": 0.08851961546923048,
+  "K_operating": 10,
+  "selfcheck_K10_reps200_p95": 0.02833976544778819,
+  "p95_by_reps": {
+    "200": 0.024731398775077847,
+    "1000": 0.02632979939486876,
+    "5000": 0.026147526370804856
+  },
+  "split_resolution": {
+    "p95_5000": 0.026259996485735588,
+    "p95_ci95_approx": [
+      0.02452049007022259,
+      0.027668808247964742
+    ],
+    "ratio_at_p95": 3.3708921293007132,
+    "ratio_ci95_approx": [
+      3.199256530166665,
+      3.6100263581896237
+    ],
+    "note": "splits share tiles (dependent), so the band is approximate/mildly optimistic"
+  },
+  "tile_jackknife_K9": {
+    "k": 9,
+    "ref_p95_all20": 0.02999412943132325,
+    "leave_one_out_p95_min": 0.027143769277577112,
+    "leave_one_out_p95_max": 0.032766414210469504,
+    "leave_one_out_p95_mean": 0.030069507100952374,
+    "leave_one_out_p95_std": 0.0016020684773308655,
+    "note": "K=9 (19-tile max balanced split); isolates tile-set sensitivity at fixed K. The K=10 operating floor differs per the power curve."
+  }
+}

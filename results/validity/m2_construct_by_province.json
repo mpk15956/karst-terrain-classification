@@ -1,0 +1,96 @@
+{
+  "comparisons": {
+    "ph_vs_nhd": {
+      "overall": {
+        "n": 20,
+        "junction_count_spearman_proxy": 0.9358233016064321,
+        "strahler_wasserstein_median": 0.28705879263855233,
+        "bifurcation_ratio_abs_diff_median": 0.18535156140776432
+      },
+      "by_province": {
+        "appalachian_highlands": {
+          "n": 7,
+          "junction_count_spearman_proxy": 0.8967247486603566,
+          "strahler_wasserstein_median": 0.28468946322481203,
+          "bifurcation_ratio_abs_diff_median": 0.035286301026062894
+        },
+        "coastal_plain": {
+          "n": 6,
+          "junction_count_spearman_proxy": 0.8930633105118332,
+          "strahler_wasserstein_median": 0.49893636685329135,
+          "bifurcation_ratio_abs_diff_median": 0.3033792552644803
+        },
+        "cumberland_plateau": {
+          "n": 7,
+          "junction_count_spearman_proxy": 0.9933551301267589,
+          "strahler_wasserstein_median": 0.2863161665815739,
+          "bifurcation_ratio_abs_diff_median": 0.20665751776200136
+        }
+      }
+    },
+    "whitebox_vs_nhd": {
+      "overall": {
+        "n": 20,
+        "junction_count_spearman_proxy": 0.9351399420347147,
+        "strahler_wasserstein_median": 0.28681588436554944,
+        "bifurcation_ratio_abs_diff_median": 0.3754204138997258
+      },
+      "by_province": {
+        "appalachian_highlands": {
+          "n": 7,
+          "junction_count_spearman_proxy": 0.8973689429337992,
+          "strahler_wasserstein_median": 0.2842185701975891,
+          "bifurcation_ratio_abs_diff_median": 0.23019381996763943
+        },
+        "coastal_plain": {
+          "n": 6,
+          "junction_count_spearman_proxy": 0.8928644912768658,
+          "strahler_wasserstein_median": 0.4990572450673712,
+          "bifurcation_ratio_abs_diff_median": 0.6306362112075404
+        },
+        "cumberland_plateau": {
+          "n": 7,
+          "junction_count_spearman_proxy": 0.9932970078983715,
+          "strahler_wasserstein_median": 0.2857180936467024,
+          "bifurcation_ratio_abs_diff_median": 0.7528558538325199
+        }
+      }
+    }
+  },
+  "overall_check": {
+    "ph_vs_nhd": {
+      "junction_count_spearman_proxy": {
+        "recomputed": 0.9358233016064321,
+        "summary": 0.9358233016064322,
+        "match": true
+      },
+      "strahler_wasserstein_median": {
+        "recomputed": 0.28705879263855233,
+        "summary": 0.28705879263855233,
+        "match": true
+      },
+      "bifurcation_ratio_abs_diff_median": {
+        "recomputed": 0.18535156140776432,
+        "summary": 0.18535156140776432,
+        "match": true
+      }
+    },
+    "whitebox_vs_nhd": {
+      "junction_count_spearman_proxy": {
+        "recomputed": 0.9351399420347147,
+        "summary": 0.9351399420347146,
+        "match": true
+      },
+      "strahler_wasserstein_median": {
+        "recomputed": 0.28681588436554944,
+        "summary": 0.28681588436554944,
+        "match": true
+      },
+      "bifurcation_ratio_abs_diff_median": {
+        "recomputed": 0.3754204138997258,
+        "summary": 0.3754204138997258,
+        "match": true
+      }
+    }
+  }
+}
