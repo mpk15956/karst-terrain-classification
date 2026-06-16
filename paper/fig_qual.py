@@ -161,7 +161,7 @@ def fig_qualitative(real, mesa):
 def main():
     print("=== whitebox figures ===")
     real = process(pick_real_patch())
-    mesa_npy = sorted((VAL / "mesa_fig_samples").glob("cumberland_plateau_*.npy"))[0]
+    mesa_npy = sorted((VAL / "mesa_batch113").glob("cumberland_plateau_*.npy"))[0]
     print(f"  mesa patch: {mesa_npy.name}")
     mesa = process(np.load(mesa_npy).astype("float32"))
     fig_pipeline(real)

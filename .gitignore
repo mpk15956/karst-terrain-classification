@@ -30,14 +30,14 @@ dist/
 # Keep small results summaries (JSON) tracked; ignore large rasters
 results/**/*.tif
 results/**/*.tiff
-# Figure-input binaries pulled from teach (reproducible; see paper/fig_qual.py)
-results/validity/mesa_fig_samples/
-# Reproducibility caches pulled from teach (H0 diagrams + SW matrices); the
-# published numbers live in the tracked JSON summaries. Local cache by default;
-# can be committed for GitHub backup on request.
-results/validity/m2_diag_cache/
-results/validity/noise_cache/
-results/validity/m2_power_probe/
+# Large local caches pulled from teach (reproducible from source; NOT committed):
+# the full generated-DEM batch and the bulky perturbation render stacks.
+results/validity/mesa_batch113/
+results/validity/m2_power_probe/*_hill.npy
+results/validity/m2_power_probe/*_stack.npy
+# The small H0-diagram and sliced-Wasserstein caches (m2_diag_cache/,
+# noise_cache/, m2_power_probe/diagrams.pkl) ARE committed for reproducibility
+# backup; they re-derive the headline, optical, noise, and trench results.
 
 # OS noise
 .DS_Store
