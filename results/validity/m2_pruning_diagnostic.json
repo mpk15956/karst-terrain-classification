@@ -1,0 +1,63 @@
+{
+  "K": 10,
+  "reps": 200,
+  "sigma": 7207221.264717237,
+  "baseline_ratio": 3.123512635710226,
+  "note": "Diagnostic, not a gate. epsilon=0 reuses cached matrices and reproduces the committed headline ratio. Essentials kept; only finite low-persistence classes pruned. Low-persistence is not synonymous with saddle-driven.",
+  "sweep": [
+    {
+      "floor_p95": 0.02833976544778819,
+      "test_median": 0.08851961546923048,
+      "ratio": 3.123512635710226,
+      "frac_above_floor": 1.0,
+      "epsilon": 0.0,
+      "pct_pruned_threshold": 0,
+      "median_real_points_kept": 1056.0
+    },
+    {
+      "floor_p95": 0.043430064484079815,
+      "test_median": 0.09748030270569996,
+      "ratio": 2.244535067209798,
+      "frac_above_floor": 1.0,
+      "epsilon": 395.0,
+      "pct_pruned_threshold": 10,
+      "median_real_points_kept": 968.0
+    },
+    {
+      "floor_p95": 0.04343905092242903,
+      "test_median": 0.09716246734000833,
+      "ratio": 2.2367539178863622,
+      "frac_above_floor": 1.0,
+      "epsilon": 847.0,
+      "pct_pruned_threshold": 25,
+      "median_real_points_kept": 815.5
+    },
+    {
+      "floor_p95": 0.04294873101165223,
+      "test_median": 0.09629629932919043,
+      "ratio": 2.242122108405594,
+      "frac_above_floor": 1.0,
+      "epsilon": 2633.0,
+      "pct_pruned_threshold": 50,
+      "median_real_points_kept": 569.0
+    },
+    {
+      "floor_p95": 0.040794037314142904,
+      "test_median": 0.09400188080555455,
+      "ratio": 2.304304427670977,
+      "frac_above_floor": 1.0,
+      "epsilon": 11447.0,
+      "pct_pruned_threshold": 75,
+      "median_real_points_kept": 315.5
+    },
+    {
+      "floor_p95": 0.038263712563505296,
+      "test_median": 0.09198918877967899,
+      "ratio": 2.4040842515479097,
+      "frac_above_floor": 1.0,
+      "epsilon": 48926.60000000012,
+      "pct_pruned_threshold": 90,
+      "median_real_points_kept": 163.0
+    }
+  ]
+}

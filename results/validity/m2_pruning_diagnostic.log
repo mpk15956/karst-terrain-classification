@@ -1,0 +1,10 @@
+226 real + 114 gen; sigma=7.2072e+06; epsilon grid (pct [0, 10, 25, 50, 75, 90]): [0.0, 395.0, 847.0, 2633.0, 11447.0, 48926.6]
+  pct= 0 eps=      0.0 -> ratio 3.12 (floor 0.0283, test 0.0885, med pts 1056)
+  pct=10 eps=    395.0 -> ratio 2.24 (floor 0.0434, test 0.0975, med pts 968)
+  pct=25 eps=    847.0 -> ratio 2.24 (floor 0.0434, test 0.0972, med pts 816)
+  pct=50 eps=   2633.0 -> ratio 2.24 (floor 0.0429, test 0.0963, med pts 569)
+  pct=75 eps=  11447.0 -> ratio 2.30 (floor 0.0408, test 0.0940, med pts 316)
+  pct=90 eps=  48926.6 -> ratio 2.40 (floor 0.0383, test 0.0920, med pts 163)
+
+baseline (eps=0) ratio = 3.12; survives-to-pct90 ratio = 2.40
+wrote results/validity/m2_pruning_diagnostic.json
