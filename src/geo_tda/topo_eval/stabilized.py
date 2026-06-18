@@ -15,6 +15,9 @@ Constraints honored (pre-registration):
   accumulation fields.
 - The PI grid and the essential-class cap are FROZEN once over the pooled corpus
   (a per-patch or per-realization grid would inject movement).
+- Imaging is in log10-accumulation COORDINATES, not raw (heavy-tailed deaths span
+  ~3.5 log decades; a linear grid collapses). See _logc and the 2026-06-18
+  pre-registration amendment; log the coordinates, never the persistence value.
 - tau is frozen per patch on the unperturbed DEM; merge_tree recomputes the mask
   {A >= tau} on each realization's perturbed accumulation at that frozen threshold.
 - The PI weight vanishes on the diagonal (persim default), satisfying the Adams
@@ -35,20 +38,50 @@ import numpy as np
 PI_PIXELS = 30        # ~30 pixels across the (capped) persistence axis
 CORR_LEN_PX = 4       # correlated-noise length, matching the saddle probe
 ROUGHNESS_WIN = 5     # window for the local-roughness amplitude scaling
+ESS_MARGIN = 0.5      # log10 units: essential cap = max finite log10-death + this
+
+
+def _logc(d) -> np.ndarray:
+    """(birth, death) -> (log10 birth, log10 death); essentials keep death = inf.
+
+    Imaging is in log10-accumulation COORDINATES because flow accumulation is heavy
+    tailed (deaths span ~3.5 log decades; births pin near tau, ~115-512): a linear
+    grid buries ~85% of features in one pixel (the grid-collapse this fixes). Logging
+    the COORDINATES keeps the diagonal at persistence' = log(d/b) = 0, where the Adams
+    weight must vanish; logging the persistence VALUE would send the diagonal to -inf
+    and break that condition (the trap). The transform is strictly monotone, so the
+    merge-tree combinatorics and the cardinality exponent N are unchanged, and on the
+    masked range A >= tau it is a (1/(tau ln10))-Lipschitz CONTRACTION, so the Adams
+    stability bound only improves (constant C_Adams |G| / (tau ln10)). Justified by
+    heavy-tailedness, NOT a power-law/Hack exponent (which is on A, not the deaths).
+    See docs/topo_eval/notes/m2_saddle_stable_prereg.md (2026-06-18 amendment).
+    """
+    a = np.asarray(d, float).reshape(-1, 2).copy()
+    a[:, 0] = np.log10(np.maximum(a[:, 0], 1.0))
+    fin = np.isfinite(a[:, 1])
+    a[fin, 1] = np.log10(np.maximum(a[fin, 1], 1.0))
+    return a
 
 
 def diagram_cap(diagrams) -> float:
-    """Global finite-death cap for essentials (matches the SW1 convention)."""
+    """Global essential-class cap in log10-accumulation coordinates.
+
+    Essentials (death = inf) are capped a fixed ADDITIVE margin above the largest
+    finite log10-death in the pooled corpus (one essential band above the finite
+    mass). A multiplicative 1.5x in log space would place essentials at 10^(1.5*max)
+    accumulation, far past the |G| cell-count ceiling, so it is wrong here.
+    """
     fins = []
     for d in diagrams:
-        a = np.asarray(d, float).reshape(-1, 2)
+        a = _logc(d)
         fins.append(a[np.isfinite(a[:, 1]), 1])
     fin = np.concatenate(fins) if fins else np.array([1.0])
-    return float(fin.max() * 1.5) if fin.size else 1.0
+    return float(fin.max() + ESS_MARGIN) if fin.size else 1.0
 
 
 def _capped(d, cap) -> np.ndarray:
-    a = np.asarray(d, float).reshape(-1, 2).copy()
+    """log10-accumulation coordinates with essentials set to the frozen cap."""
+    a = _logc(d)
     a[~np.isfinite(a[:, 1]), 1] = cap
     return a
 
@@ -72,15 +105,24 @@ def make_imager(diagrams, cap: float | None = None, pixels: int = PI_PIXELS):
     from persim import PersistenceImager
     if cap is None:
         cap = diagram_cap(diagrams)
-    max_birth = 0.0
+    # Size pixels to the PERSISTENCE span (pixels across the persistence axis), not the
+    # death cap. In log coordinates births are not negligible relative to persistence,
+    # so cap-sized pixels would over-smooth; persistence-sized pixels give the
+    # pre-registered ~PI_PIXELS resolution and a one-pixel kernel near the verified
+    # sigma. Ranges are tight to the pooled (capped) corpus so the grid is frozen.
+    min_birth, max_birth, max_pers = np.inf, 0.0, 0.0
     for d in diagrams:
         a = _capped(d, cap)
         if a.size:
+            min_birth = min(min_birth, float(a[:, 0].min()))
             max_birth = max(max_birth, float(a[:, 0].max()))
-    ps = cap / pixels
+            max_pers = max(max_pers, float((a[:, 1] - a[:, 0]).max()))
+    if not np.isfinite(min_birth):
+        min_birth, max_birth, max_pers = 0.0, cap, cap
+    ps = (max_pers / pixels) if max_pers > 0 else (cap / pixels)
     pim = PersistenceImager(
-        birth_range=(0.0, max_birth if max_birth > 0 else cap),
-        pers_range=(0.0, cap),
+        birth_range=(min_birth, max_birth if max_birth > min_birth else min_birth + ps),
+        pers_range=(0.0, max_pers if max_pers > 0 else cap),
         pixel_size=ps,
         kernel_params={"sigma": [[ps ** 2, 0.0], [0.0, ps ** 2]]},
     )

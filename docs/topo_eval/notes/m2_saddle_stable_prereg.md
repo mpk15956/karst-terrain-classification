@@ -143,3 +143,78 @@ stabilized currency.
 3. The amplitude pick (Stage 0.5) is committed before any real-vs-real stabilized
    null.
 4. The branch is read only after Stage 2, and the sentence is the template above.
+
+## Amendment (2026-06-18): persistence-image coordinates are log10-accumulation
+
+This amends the constants above BEFORE any stabilized real-vs-real null is computed
+(it precedes the Stage-0.5 sweep), per the constants discipline. It was forced by a
+hard failure and verified by three adversarial subagents (one theory, one data
+geometry, one gate-robustness); the advisor input that prompted it is corrected where
+it overreached.
+
+**Why.** On real flow-accumulation H0 diagrams the births cluster near tau (~115-512)
+while finite deaths reach ~530,000 (a ~1000x dynamic range; deaths span ~3.5 log10
+decades). A square-pixel persistence-image grid sized to the death/persistence axis
+gives the birth axis zero pixels, so the image collapsed to length 0. This affects
+ONLY the stabilized/ensemble persistence-image statistic; the base sliced-Wasserstein
+MMD headline operates on raw diagrams and is scale-tolerant, so it is untouched.
+
+**Decision.** Image in log10-accumulation COORDINATES: map each diagram point
+`(b, d) -> (log10 b, log10 d)`, image on the resulting (birth, persistence') plane.
+NOT the persistence value: `log(d - b)` sends the diagonal to minus infinity and
+breaks the Adams "weight vanishes on the diagonal" condition (in Adams' post-transform
+birth-persistence plane); logging the coordinates keeps the diagonal at
+`persistence' = log(d/b) = 0` where the weight correctly vanishes.
+
+**Justification is distributional, not a power law.** The deaths are heavy-tailed
+(coefficient of variation 2.6, p99/p50 ~ 99, top 1% hold ~19% of death-mass) and span
+~3.5 log decades, so a linear grid buries ~85% of features in one pixel. They are NOT
+a clean power law (Hill alpha drifts 0.6 -> 3.8 down the tail) and NOT near the Hack
+exponent 0.43 (that is the exponent on the accumulation field A, not on diagram
+deaths). Justify log by heavy-tailedness and the log-decade span, never by Hack's law.
+
+**Grid and kernel.** Essential cap = max finite log10-death over the pooled corpus
+PLUS an additive margin (`ESS_MARGIN = 0.5`), not a multiplicative 1.5x (which in log
+space would place essentials at 10^(1.5 max) accumulation, far past the |G| cell
+ceiling). Pixels are sized to the PERSISTENCE span (PI_PIXELS across the persistence
+axis), giving pixel_size ~ 0.14 log10-units on the real corpus; the Gaussian kernel
+covariance is one pixel (within-patch log-persistence spread ~ 0.74, so one pixel does
+not wash out). Grid, cap, and tau remain frozen once over the pooled real+generated
+corpus.
+
+**Stability (the proof survives, with a better constant).** log10 is strictly
+monotone, so the merge-tree combinatorics, the heads/confluences bijection, and the
+cardinality exponent N are unchanged (filtering on log A equals computing the diagram
+on A and log-transforming its coordinates; merge_tree.py is untouched). On the masked
+range A >= tau the transform is a `1/(tau ln 10)`-Lipschitz CONTRACTION, so the
+Theorem-3a -> cardinality-lemma -> Adams chain gives `C_Adams |G| / (tau ln 10)`,
+strictly tighter than the raw bound. See docs/topo_eval/notes/proof_obligations_referee.md.
+
+**Gate robustness (the differential-compression hazard is refuted in direction).** A
+controlled high-death-vs-mid-death perturbation test found that log makes the saddle
+term RELATIVELY LARGER, not smaller (R_log / R_fair-linear ~ 4-9x): log gives every
+decade equal axis room, so equal-relative saddle and signal kicks get equal pixel
+budgets. Log is therefore the CONSERVATIVE choice for the attribution gate (it lets
+Theorem-3b saddle movement register more, making the macro-attribution claim harder,
+not easier). Consequently: do NOT add a linear-normalized-grid persistence image as a
+co-equal gate comparator (the linear grid is degenerate at this dynamic range). If a
+referee belt is wanted, report ONE robustness line under a quantile (rank) coordinate,
+which pushes the saddle term even smaller (gate even harder), confirming log is
+conservative; flag that the quantile coordinate is a one-off sensitivity cross-check,
+NOT a valid frozen statistic (it is non-Lipschitz and corpus-coupled, which would also
+contaminate the spatial-split null).
+
+**Representation (2D image stays primary; 1D is a documented contingency).** The log
+diagram point cloud is empirically near rank-1 (PCA PC1 = 98.5% pooled, 99.1-99.6% in
+every patch; births contribute under 0.2% to the base sliced-Wasserstein distance; the
+birth spread is mostly tau drifting across patches). The pre-registered 2D log10
+persistence image stays the PRIMARY stabilized statistic (Adams-backed, locked). A 1D
+log-persistence representation (a persistence landscape, Bubenik 2015 stability) is a
+documented contingency, to be adopted only if the Stage-1 J=16-vs-J=32 smoke shows the
+near-degenerate birth axis materially inflates finite-J variance.
+
+**Corrections folded in (do not repeat in the writeup).** The advisor framing that
+independent per-axis linear scaling "breaks the math" is OVERSTATED: a frozen linear
+rescale is fully Adams-valid and stable (the diagonal still maps to the horizontal
+axis where the weight vanishes); the real defect is distributional degeneracy. And the
+power-law / Hack-exponent justification does not apply to the diagram deaths.

@@ -42,9 +42,24 @@ def test_frozen_grid_constant_feature_length():
     pim, cap = st.make_imager(diags)
     lengths = {len(st.persistence_image(d, pim, cap)) for d in diags}
     assert len(lengths) == 1, "frozen grid must give a constant feature length"
+    L = lengths.pop()
+    assert L > 0, "grid collapsed to length 0 (the linear-coords birth-axis bug)"
     # pruning the input must NOT change the grid / feature length
     pruned = st.prune_diagram(diags[0], eps=5000.0)
-    assert len(st.persistence_image(pruned, pim, cap)) == lengths.pop()
+    assert len(st.persistence_image(pruned, pim, cap)) == L
+
+
+def test_log_grid_resolves_both_axes_on_heavy_tailed_data():
+    # Regression for the linear-coords collapse: raw flow-accumulation diagrams have
+    # births ~1e2 and deaths ~1e5, so a square-pixel linear grid sized to the death
+    # axis gave the birth axis 0 pixels (feature length 0). log10 coordinates must
+    # produce a genuine 2D image with both axes resolved (> 1 pixel).
+    diags = _cached_real()[:40]
+    pim, cap = st.make_imager(diags)
+    img2d = np.asarray(pim.transform(st._capped(diags[0], cap), skew=True), float)
+    assert img2d.ndim == 2 and min(img2d.shape) >= 2, f"birth axis collapsed: {img2d.shape}"
+    # the cap lives in log space, comfortably below the |G| cell-count ceiling
+    assert cap < 9.0, f"essential cap {cap} is implausibly large for log10-accumulation"
 
 
 def test_persistence_image_finite_and_nonnegative():
@@ -65,9 +80,11 @@ def test_feature_distance_matrix_matches_bruteforce():
     assert np.isclose(D[3, 7], bf)
 
 
-def test_cap_matches_sliced_wasserstein_convention():
-    # essentials capped at 1.5 * max finite death across the corpus
+def test_cap_log_space_additive_convention():
+    # essentials capped an ADDITIVE margin above the max finite log10-death (a
+    # multiplicative 1.5x in log space would overshoot past the |G| cell ceiling)
     diags = _cached_real()
     cap = st.diagram_cap(diags)
-    fin = np.concatenate([d[np.isfinite(d[:, 1]), 1] for d in diags])
-    assert np.isclose(cap, fin.max() * 1.5)
+    logfin = np.concatenate(
+        [np.log10(np.maximum(d[np.isfinite(d[:, 1]), 1], 1.0)) for d in diags])
+    assert np.isclose(cap, logfin.max() + st.ESS_MARGIN)
