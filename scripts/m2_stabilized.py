@@ -39,6 +39,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import shutil
 import sys
 import tempfile
@@ -49,6 +50,16 @@ import numpy as np
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
+
+# Set GDAL/PROJ data dirs from the interpreter prefix when unset, so geopandas/pyogrio
+# can read NHD flowlines under a bare (non-activated) interpreter, e.g. invoking
+# .pixi/envs/cpu/bin/python directly on elis without `pixi run`. No-op when already set
+# (the GACRC sbatch resolves them via its environment).
+for _var, _sub in (("GDAL_DATA", "gdal"), ("PROJ_DATA", "proj"), ("PROJ_LIB", "proj")):
+    if not os.environ.get(_var):
+        _d = Path(sys.prefix) / "share" / _sub
+        if _d.is_dir():
+            os.environ[_var] = str(_d)
 
 from geo_tda.topo_eval.stabilized import (  # noqa: E402
     ensemble_diagrams, make_imager, persistence_image,
@@ -251,7 +262,11 @@ def cmd_sweep(args) -> int:
               f"power {f['median_power_frac_of_raw']:.2f}x raw, "
               f"rho={f['median_rho_saddle_over_power']:.3f}", flush=True)
     print(f"  suggested pick: {suggested} m", flush=True)
-    print(f"wrote {args.out.relative_to(ROOT)}", flush=True)
+    try:
+        rel = args.out.relative_to(ROOT)
+    except ValueError:
+        rel = args.out  # --out may be outside the repo (e.g. a /tmp smoke path)
+    print(f"wrote {rel}", flush=True)
     return 0
 
 
