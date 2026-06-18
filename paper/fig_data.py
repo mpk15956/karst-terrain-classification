@@ -199,8 +199,8 @@ def fig_sensitivity():
             if "flips" in p and "rr_h0" in p:
                 fl.append(p["flips"]); rr.append(p["rr_h0"])
     ax2.scatter(fl, rr, s=18, color="#0072B2", alpha=0.7, label="real perturbations")
-    v = saddle.get("verdict", {})
-    mesa_rr = v.get("mesa_rr_h0") or v.get("rr_h0_mesa") or 1.27
+    # MESA raw H0 movement ratio: read from the committed JSON, not hardcoded.
+    mesa_rr = load("m2_raw_movement.json")["raw_movement_ratio_mean"]
     ax2.axhline(mesa_rr, ls="--", color="#D55E00", lw=1.3, label=f"MESA operating point ({mesa_rr:.2f})")
     ax2.axhline(1.0, ls=":", color="#888888", lw=1, label="real-vs-real baseline (1.0)")
     ax2.set_xscale("log")
