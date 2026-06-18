@@ -1,0 +1,11 @@
+{
+  "n_real": 226,
+  "n_generated": 114,
+  "mean_real_to_real_sw_h0": 7972357.780020591,
+  "mean_generated_to_real_sw_h0": 10116576.373125529,
+  "raw_movement_ratio_mean": 1.268956643977837,
+  "median_real_to_real_sw_h0": 7207221.264717237,
+  "median_generated_to_real_sw_h0": 9083458.52728921,
+  "raw_movement_ratio_median": 1.2603274124185757,
+  "note": "Raw diagram-movement magnitude (the SECOND Results currency, distinct from the 3.12x distributional MMD/floor separation). Mean generated-to-real over mean real-to-real H0 sliced-Wasserstein distance, from the cached SW blocks. The real-to-real mean excludes the zero diagonal. This is NOT a saddle fraction: it attributes no share of the divergence to saddle rerouting; it is only a magnitude, which the saddle probe shows D8 rerouting can itself reach."
+}
